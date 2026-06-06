@@ -11,16 +11,21 @@ body{
   background:#0b0b0b;
   color:white;
 }
-.header h1{
-  color:#42ff29;
-  text-shadow:0 0 10px #42ff29;
-}
+
 .header{
   text-align:center;
   padding:15px;
   background:#111;
   border-bottom:2px solid #222;
 }
+
+.header h1{
+  color:#42ff29;
+  text-shadow:0 0 10px #42ff29;
+  margin:0;
+}
+
+/* HUD */
 .hud{
   display:flex;
   align-items:center;
@@ -28,7 +33,6 @@ body{
   padding:0 20px;
 }
 
-/* button-like HUD panels */
 .hudBox{
   padding:12px 18px;
   border-radius:12px;
@@ -38,37 +42,12 @@ body{
   font-weight:bold;
   box-shadow:0 0 10px rgba(66,255,41,0.3);
   user-select:none;
-}
-
-/* prevent clicking feel */
-.hudBox{
   pointer-events:none;
 }
 
-/* title in center */
-.header h1{
-  color:#42ff29;
-  text-shadow:0 0 10px #42ff29;
-  margin:0;
-}
-.stats{
-  display:flex;
-  justify-content:center;
-  gap:40px;
-}
+#rollBox{ color:#42ff29; }
 
-.roll-area{
-  text-align:center;
-  padding:30px;
-}
-function rarityColor(o){
-  if(o<=5) return "#9e9e9e";
-  if(o<=25) return "#4da6ff";
-  if(o<=100) return "#b84dff";
-  if(o<=1000) return "gold";
-  return "#ff3b3b";
-}
-/* ROLL DISPLAY */
+/* DISPLAY */
 #display{
   width:360px;
   margin:20px auto;
@@ -128,58 +107,19 @@ function rarityColor(o){
   border-radius:50%;
 }
 
-/* rarity glow + color themes */
-/* INVENTORY CARD RARITIES */
-.card.common{
-  box-shadow:0 0 8px gray;
-  background:linear-gradient(145deg,#1a1a1a,#2a2a2a);
-}
+/* rarity */
+.card.common{ box-shadow:0 0 8px gray; background:#1a1a1a; }
+.card.rare{ box-shadow:0 0 12px #4da6ff; background:#0b1a2a; }
+.card.epic{ box-shadow:0 0 18px #b84dff; background:#1a0b2a; }
+.card.legendary{ box-shadow:0 0 25px gold; background:#2a220b; }
+.card.mythic{ box-shadow:0 0 35px red; background:#2a0b0b; }
 
-.card.rare{
-  box-shadow:0 0 12px #4da6ff;
-  background:linear-gradient(145deg,#0b1a2a,#123a66);
-}
-
-.card.epic{
-  box-shadow:0 0 18px #b84dff;
-  background:linear-gradient(145deg,#1a0b2a,#3a1266);
-}
-
-.card.legendary{
-  box-shadow:0 0 25px gold;
-  background:linear-gradient(145deg,#2a220b,#665012);
-}
-
-.card.mythic{
-  box-shadow:0 0 35px red;
-  background:linear-gradient(145deg,#2a0b0b,#661212);
-}
-
-/* PREVIEW SCREEN RARITIES */
-#display.common{
-  background:linear-gradient(145deg,#1a1a1a,#2a2a2a);
-  box-shadow:0 0 15px gray;
-}
-
-#display.rare{
-  background:linear-gradient(145deg,#0b1a2a,#123a66);
-  box-shadow:0 0 20px #4da6ff;
-}
-
-#display.epic{
-  background:linear-gradient(145deg,#1a0b2a,#3a1266);
-  box-shadow:0 0 25px #b84dff;
-}
-
-#display.legendary{
-  background:linear-gradient(145deg,#2a220b,#665012);
-  box-shadow:0 0 30px gold;
-}
-
-#display.mythic{
-  background:linear-gradient(145deg,#2a0b0b,#661212);
-  box-shadow:0 0 40px red;
-}
+/* preview */
+#display.common{ box-shadow:0 0 15px gray; }
+#display.rare{ box-shadow:0 0 20px #4da6ff; }
+#display.epic{ box-shadow:0 0 25px #b84dff; }
+#display.legendary{ box-shadow:0 0 30px gold; }
+#display.mythic{ box-shadow:0 0 40px red; }
 
 /* locked */
 .locked img{
@@ -195,9 +135,7 @@ function rarityColor(o){
   font-size:26px;
 }
 
-.card:hover{
-  transform: scale(1.03);
-}
+.card:hover{ transform:scale(1.03); }
 
 </style>
 </head>
@@ -205,7 +143,6 @@ function rarityColor(o){
 <body>
 
 <div class="header">
-
   <div class="hud">
 
     <div class="hudBox" id="rollBox">
@@ -219,7 +156,6 @@ function rarityColor(o){
     </div>
 
   </div>
-
 </div>
 
 <div class="roll-area">
@@ -252,17 +188,16 @@ const viewers = [
   {name:"Christ_Is_God", odds:5000, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/98b31c09-fa8b-4318-88bd-ef8a0443b772-profile_image-70x70.png"},
   {name:"theosGMD", odds:10000, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/0ffc8233-6b32-411e-bfbd-4167c09cc2a2-profile_image-70x70.png"}
 ];
+
 const defaultViewer = viewers[viewers.length - 1];
+
 /* DATA */
 let inventory = JSON.parse(localStorage.getItem("inv")||"{}");
 let rolls = Number(localStorage.getItem("rolls")||0);
 let best = JSON.parse(localStorage.getItem("best")) || null;
 
 document.getElementById("rolls").innerText = rolls;
-if(best){
-  document.getElementById("best").innerText =
-    `${best.name} (1/${best.odds})`;
-}
+
 /* RARITY */
 function rarity(o){
   if(o<=5) return "common";
@@ -272,20 +207,17 @@ function rarity(o){
   return "mythic";
 }
 
+function rarityColor(o){
+  if(o<=5) return "#9e9e9e";
+  if(o<=25) return "#4da6ff";
+  if(o<=100) return "#b84dff";
+  if(o<=1000) return "gold";
+  return "#ff3b3b";
+}
+
 /* RNG */
-function pick(p){
-  const sorted=[...viewers].sort((a,b)=>b.odds-a.odds);
-
-  let dropZone = p > 0.7 && p < 0.9;
-
-  for(let v of sorted){
-    if(dropZone && v.odds >= 100){
-      if(Math.random() < 1/(v.odds/2)) return v;
-    }
-    if(Math.floor(Math.random()*v.odds)===0) return v;
-  }
-
-  return viewers[0];
+function pick(){
+  return viewers[Math.floor(Math.random()*viewers.length)];
 }
 
 /* ROLL */
@@ -305,19 +237,14 @@ function roll(){
     let p = (t - start) / rollDuration;
     if(p > 1) p = 1;
 
-    let curve = 1 - Math.pow(1 - p, 4);
-    let delay = 35 + (220 * curve);
+    let delay = 35 + (220 * p);
 
     if(p < 1){
-
-      let v = viewers[Math.floor(Math.random()*viewers.length)];
+      let v = pick();
       show(v);
-
       setTimeout(()=>requestAnimationFrame(frame), delay);
-
     } else {
-
-      let final = pick(p);
+      let final = pick();
       show(final);
       finish(final);
       running = false;
@@ -327,7 +254,7 @@ function roll(){
   requestAnimationFrame(frame);
 }
 
-/* 🔥 FIX: RARITY SYNCED DISPLAY UPDATE */
+/* SHOW */
 function show(v){
   const display = document.getElementById("display");
 
@@ -335,29 +262,22 @@ function show(v){
   document.getElementById("name").innerText = v.name;
   document.getElementById("odds").innerText = "1 in " + v.odds;
 
-  display.className = "";
-  display.classList.add(rarity(v.odds));
+  display.className = rarity(v.odds);
 }
+
 /* FINISH */
 function finish(v){
 
   inventory[v.name] = (inventory[v.name] || 0) + 1;
 
   if(!best || v.odds > best.odds){
-  best = {
-    name: v.name,
-    odds: v.odds
-  };
+    best = { name:v.name, odds:v.odds };
 
-  const bestBox = document.getElementById("bestBox");
-  const bestText = document.getElementById("best");
+    const bestBox = document.getElementById("bestBox");
+    const bestText = document.getElementById("best");
 
-  bestText.innerText = `${best.name} (1/${best.odds})`;
-  bestBox.style.color = rarityColor(best.odds);
-}
-
-    document.getElementById("best").innerText =
-      `${best.name} (1/${best.odds})`;
+    bestText.innerText = `${best.name} (1/${best.odds})`;
+    bestBox.style.color = rarityColor(best.odds);
   }
 
   save();
@@ -389,11 +309,9 @@ function save(){
   localStorage.setItem("rolls", rolls);
   localStorage.setItem("best", JSON.stringify(best));
 }
+
+/* START STATE */
 show(defaultViewer);
-document.getElementById("odds").innerText = "1 in " + defaultViewer.odds;
-document.getElementById("name").innerText = defaultViewer.name;
-document.getElementById("img").src = defaultViewer.image;
-document.getElementById("display").className = rarity(defaultViewer.odds);
 render();
 
 </script>
