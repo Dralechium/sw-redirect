@@ -30,14 +30,14 @@ body{
   padding:30px;
 }
 
-/* 🎴 ROLL DISPLAY CARD */
+/* ROLL DISPLAY */
 #display{
   width:360px;
   margin:20px auto;
   padding:20px;
   border-radius:15px;
   background:#181818;
-  transition:0.25s ease;
+  transition:0.2s ease;
 }
 
 #display img{
@@ -90,7 +90,7 @@ body{
   border-radius:50%;
 }
 
-/* rarity glow + colors */
+/* rarity glow + color themes */
 .common{
   box-shadow:0 0 8px gray;
   background: linear-gradient(145deg, #1a1a1a, #2a2a2a);
@@ -214,16 +214,6 @@ function pick(p){
 /* ROLL */
 let running=false;
 
-function applyDisplayRarity(v){
-  const display = document.getElementById("display");
-
-  // reset first (important to prevent class stacking bugs)
-  display.className = "";
-
-  // apply rarity class
-  display.classList.add(rarity(v.odds));
-}
-
 function roll(){
   if(running) return;
   running=true;
@@ -260,13 +250,18 @@ function roll(){
   requestAnimationFrame(frame);
 }
 
-/* SHOW */
+/* 🔥 FIX: RARITY SYNCED DISPLAY UPDATE */
 function show(v){
+  const display = document.getElementById("display");
+
   document.getElementById("img").src = v.image;
   document.getElementById("name").innerText = v.name;
   document.getElementById("odds").innerText = "1 in " + v.odds;
 
-  applyDisplayRarity(v); // 🎯 THIS IS THE FIX
+  // FORCE CLEAN RESET EVERY FRAME (prevents visual lag bugs)
+  display.className = "";
+  display.offsetHeight; // forces repaint so color updates instantly
+  display.classList.add(rarity(v.odds));
 }
 
 /* FINISH */
