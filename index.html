@@ -25,7 +25,6 @@ body{
   gap:40px;
 }
 
-/* DISPLAY */
 .roll-area{
   text-align:center;
   padding:30px;
@@ -55,7 +54,6 @@ body{
 
 #odds{ color:#aaa; }
 
-/* BUTTON */
 .rollBtn{
   padding:18px 70px;
   font-size:20px;
@@ -80,6 +78,9 @@ body{
   border-radius:12px;
   text-align:center;
   padding:10px;
+  position:relative;
+  overflow:hidden;
+  transition:0.3s;
 }
 
 .card img{
@@ -88,16 +89,31 @@ body{
   border-radius:50%;
 }
 
-/* RARITY GLOWS (FIXED BACK) */
+/* RARITY GLOWS */
 .common{ box-shadow:0 0 8px gray; }
 .rare{ box-shadow:0 0 12px #4da6ff; }
 .epic{ box-shadow:0 0 18px #b84dff; }
 .legendary{ box-shadow:0 0 25px gold; }
 .mythic{ box-shadow:0 0 35px red; }
 
-.locked{
-  filter:grayscale(1);
-  opacity:0.4;
+/* 🔒 LOCKED STYLE (NEW) */
+.locked img{
+  filter:blur(8px) grayscale(1);
+  transform:scale(1.1);
+}
+
+.lockIcon{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  font-size:28px;
+  opacity:0.9;
+  pointer-events:none;
+}
+
+.lockedText{
+  color:#666;
 }
 
 </style>
@@ -130,6 +146,18 @@ body{
 
 <script>
 
+/* 🎧 SOUND PLACEHOLDER (PUT YOUR OWN LINK HERE) */
+let rollSound = new Audio(""); 
+// Example later:
+// let rollSound = new Audio("https://yourlink.com/sound.mp3");
+
+function playSound(){
+  if(rollSound.src){
+    rollSound.currentTime = 0;
+    rollSound.play().catch(()=>{});
+  }
+}
+
 /* VIEWERS */
 const viewers = [
   {name:"duckwithsunnies", odds:2, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/6ef3b0ef-bc0b-463d-a3d9-1f2a646a534f-profile_image-70x70.png"},
@@ -151,27 +179,6 @@ let best = Number(localStorage.getItem("best")||0);
 
 document.getElementById("rolls").innerText = rolls;
 
-/* FIXED BEST DISPLAY ON LOAD */
-function updateBestUI(){
-  if(best>0){
-    let v = viewers.find(x=>x.odds===best);
-    if(v){
-      document.getElementById("best").innerText =
-        v.name + " (1/" + v.odds + ")";
-    }
-  }
-}
-updateBestUI();
-
-/* RARITY */
-function rarity(o){
-  if(o<=5) return "common";
-  if(o<=25) return "rare";
-  if(o<=100) return "epic";
-  if(o<=1000) return "legendary";
-  return "mythic";
-}
-
 /* RNG */
 function pick(){
   const sorted=[...viewers].sort((a,b)=>b.odds-a.odds);
@@ -181,12 +188,14 @@ function pick(){
   return viewers[0];
 }
 
-/* ROLL (FAST → SLOW) */
+/* FAST → SLOW ROLL */
 let running=false;
 
 function roll(){
   if(running) return;
   running=true;
+
+  playSound();
 
   rolls++;
   document.getElementById("rolls").innerText=rolls;
@@ -196,20 +205,14 @@ function roll(){
 
   function frame(t){
     const p=(t-start)/duration;
-
     const ease=1-Math.pow(1-Math.min(p,1),3);
-
     const delay=40+(180*ease);
 
     if(p<1){
-
       let v=viewers[Math.floor(Math.random()*viewers.length)];
       show(v);
-
       setTimeout(()=>requestAnimationFrame(frame),delay);
-
     } else {
-
       let final=pick();
       show(final);
       finish(final);
@@ -220,35 +223,27 @@ function roll(){
   requestAnimationFrame(frame);
 }
 
-/* SHOW + FIXED GLOW */
+/* SHOW */
 function show(v){
   document.getElementById("img").src=v.image;
   document.getElementById("name").innerText=v.name;
   document.getElementById("odds").innerText="1 in "+v.odds;
-
-  // 🔥 THIS WAS MISSING BEFORE (CAUSE OF NO GLOW)
-  document.getElementById("display").className = rarity(v.odds);
 }
 
 /* FINISH */
 function finish(v){
-
 inventory[v.name]=(inventory[v.name]||0)+1;
 
-/* BEST FIXED */
-if(v.odds > best){
-  best = v.odds;
-  let bestV = viewers.find(x=>x.odds===best);
-
-  document.getElementById("best").innerText =
-    bestV.name + " (1/" + bestV.odds + ")";
+if(v.odds>best){
+best=v.odds;
+document.getElementById("best").innerText=v.name+" (1/"+v.odds+")";
 }
 
 save();
 render();
 }
 
-/* INVENTORY */
+/* INVENTORY WITH LOCKED BLUR CARDS */
 function render(){
 
 let inv=document.getElementById("inventory");
@@ -259,14 +254,23 @@ for(let v of viewers){
 let owned = inventory[v.name];
 
 inv.innerHTML+=`
-<div class="card ${rarity(v.odds)} ${owned?"":"locked"}">
-<img src="${owned ? v.image : "https://i.imgur.com/8QfQ3vR.png"}">
-<div>${owned ? v.name : "???"}</div>
-<div>${owned ? "1 in "+v.odds : "Locked"}</div>
-<div>${owned ? "x"+owned : ""}</div>
+<div class="card ${owned ? "" : "locked"} ${owned ? rarity(v.odds) : ""}">
+  <img src="${v.image}">
+  ${!owned ? '<div class="lockIcon">🔒</div>' : ""}
+  <div>${owned ? v.name : "???"}</div>
+  <div>${owned ? "1 in "+v.odds : "Locked"}</div>
+  <div>${owned ? "x"+owned : ""}</div>
 </div>`;
 }
 
+}
+
+function rarity(o){
+if(o<=5) return "common";
+if(o<=25) return "rare";
+if(o<=100) return "epic";
+if(o<=1000) return "legendary";
+return "mythic";
 }
 
 function save(){
