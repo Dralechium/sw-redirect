@@ -142,29 +142,37 @@ body{
 /* 🎛️ MANUAL SETTINGS */
 let rollDuration = 3000; // change spin speed here
 
-/* 🎵 AUDIO PLACEHOLDER SYSTEM */
-const AUDIO_PLACEHOLDER = "https://cdn.discordapp.com/attachments/836828986180239371/1512824863386243143/Lucky_wheel_spin_sound_effect.mp3";
+/* 🎵 BEST AUDIO SYSTEM (DISCORD MP3) */
+const AUDIO_URL =
+"https://cdn.discordapp.com/attachments/836828986180239371/1512824863386243143/Lucky_wheel_spin_sound_effect.mp3";
 
-/* ONE STABLE AUDIO OBJECT (IMPORTANT FIX) */
-let rollAudio = new Audio(AUDIO_PLACEHOLDER);
+/* single persistent audio instance (IMPORTANT) */
+const rollAudio = new Audio(AUDIO_URL);
 rollAudio.preload = "auto";
 rollAudio.volume = 1;
+rollAudio.loop = false;
 
-/* unlock audio on first click (browser rule) */
+/* unlock audio after first interaction (browser rule) */
 document.addEventListener("click", () => {
-  rollAudio.play().then(()=>rollAudio.pause()).catch(()=>{});
+  rollAudio.play().then(() => {
+    rollAudio.pause();
+    rollAudio.currentTime = 0;
+  }).catch(()=>{});
 }, { once:true });
 
-function playSoundPlaceholder(){
-  rollAudio.pause();
-  rollAudio.currentTime = 0;
+function playRollSound(){
+  try {
+    rollAudio.pause();
+    rollAudio.currentTime = 0;
 
-  const playPromise = rollAudio.play();
-
-  if(playPromise !== undefined){
-    playPromise.catch(err => {
-      console.log("Audio blocked or invalid source:", err);
-    });
+    const p = rollAudio.play();
+    if(p !== undefined){
+      p.catch(err => {
+        console.log("Audio blocked or failed:", err);
+      });
+    }
+  } catch(e){
+    console.log("Audio error:", e);
   }
 }
 
@@ -224,8 +232,8 @@ function roll(){
   if(running) return;
   running=true;
 
-  /* 🎵 PLAY SOUND */
-  playSoundPlaceholder();
+  /* 🔊 PLAY SOUND */
+  playRollSound();
 
   rolls++;
   document.getElementById("rolls").innerText = rolls;
@@ -252,6 +260,9 @@ function roll(){
       show(final);
       finish(final);
       running = false;
+
+      rollAudio.pause();
+      rollAudio.currentTime = 0;
     }
   }
 
