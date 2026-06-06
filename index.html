@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>theos RNG</title>
+<title>Viewer RNG</title>
 
 <style>
 body{
@@ -58,7 +58,7 @@ body{
   color:#aaa;
 }
 
-/* BIGGER ROLL BUTTON UNDER DISPLAY */
+/* BIG ROLL BUTTON */
 .rollBtn{
   padding:18px 60px;
   font-size:20px;
@@ -68,10 +68,6 @@ body{
   background:#5865F2;
   color:white;
   margin-top:10px;
-}
-
-button:hover{
-  opacity:0.9;
 }
 
 /* PANELS */
@@ -107,16 +103,12 @@ button:hover{
   border-radius:50%;
 }
 
-/* RARITY GLOWS */
+/* RARITIES */
 .common{ box-shadow:0 0 10px gray; }
 .rare{ box-shadow:0 0 15px #4da6ff; }
 .epic{ box-shadow:0 0 20px #b84dff; }
 .legendary{ box-shadow:0 0 25px gold; }
 .mythic{ box-shadow:0 0 35px red; }
-
-.collection-item{
-  margin:5px 0;
-}
 
 .discovered{ color:#7CFF7C; }
 .undiscovered{ color:#666; }
@@ -202,7 +194,7 @@ function pick(){
   return viewers[0];
 }
 
-/* FAST → SLOW ANIMATION */
+/* FIXED FAST → SLOW ROLL */
 let running=false;
 
 function roll(){
@@ -212,29 +204,32 @@ function roll(){
   rolls++;
   document.getElementById("rolls").innerText=rolls;
 
-  let duration = 2500;
-  let start = performance.now();
+  const duration = 2600;
+  const start = performance.now();
 
   function frame(time){
-    let progress = (time-start)/duration;
+    const progress = (time - start) / duration;
 
-    // ease-out (slow at end)
-    let speed = Math.max(50, 200 * (1 - progress));
+    // smooth slow-down (FAST → SLOW)
+    const easeOut = 1 - Math.pow(1 - Math.min(progress,1), 3);
+
+    const minDelay = 40;
+    const maxDelay = 220;
+    const delay = minDelay + (maxDelay - minDelay) * easeOut;
 
     if(progress < 1){
 
-      let v = viewers[Math.floor(Math.random()*viewers.length)];
+      const v = viewers[Math.floor(Math.random()*viewers.length)];
       show(v);
 
-      setTimeout(()=>requestAnimationFrame(frame), speed);
+      setTimeout(()=>requestAnimationFrame(frame), delay);
 
     } else {
 
-      let final = pick();
+      const final = pick();
       show(final);
       finish(final);
-      running=false;
-
+      running = false;
     }
   }
 
@@ -246,7 +241,6 @@ function show(v){
   document.getElementById("img").src=v.image;
   document.getElementById("name").innerText=v.name;
   document.getElementById("odds").innerText="1 in "+v.odds;
-
   document.getElementById("display").className=rarity(v.odds);
 }
 
@@ -267,21 +261,19 @@ save();
 render();
 }
 
-/* INVENTORY SORTED LOW → HIGH RARITY */
+/* INVENTORY SORT LOW → HIGH RARITY */
 function render(){
 
 let inv=document.getElementById("inv");
 inv.innerHTML="";
 
-let entries = Object.entries(inventory)
+let entries=Object.entries(inventory)
 .sort((a,b)=>{
-let va=viewers.find(v=>v.name===a[0]).odds;
-let vb=viewers.find(v=>v.name===b[0]).odds;
-return va - vb;
+return viewers.find(v=>v.name===a[0]).odds -
+       viewers.find(v=>v.name===b[0]).odds;
 });
 
 for(let [name,count] of entries){
-
 let v=viewers.find(x=>x.name===name);
 
 inv.innerHTML+=`
