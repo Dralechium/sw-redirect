@@ -1,68 +1,438 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Diamond's Disciples Sonic Wave Completions</title>
+<meta charset="UTF-8">
+<title>Viewer RNG</title>
 
-  <style>
-    body {
-      background: url("https://cdn.discordapp.com/avatars/544969284468736010/04a3b3d745e2028be945bcfa278ed7b5.webp?size=1024") no-repeat center center fixed;
-      background-size: cover;
-      color: white;
-      font-family: Arial;
-      text-align: center;
-      padding-top: 80px;
-    }
+<style>
+body{
+    margin:0;
+    background:#0b0b0b;
+    color:white;
+    font-family:Arial,sans-serif;
+}
 
-    h1 {
-      text-shadow: 2px 2px 5px black;
-    }
+.header{
+    text-align:center;
+    padding:20px;
+    background:#111;
+    border-bottom:2px solid #222;
+}
 
-    .btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
+.stats{
+    display:flex;
+    justify-content:center;
+    gap:40px;
+    margin-top:10px;
+}
 
-      width: 320px;
-      margin: 20px auto;
-      padding: 12px;
+.roll-section{
+    text-align:center;
+    padding:40px;
+}
 
-      background: #5865F2;
-      color: white;
-      text-decoration: none;
+#rollDisplay{
+    width:350px;
+    margin:30px auto;
+    padding:20px;
+    border-radius:15px;
+    background:#181818;
+    transition:.3s;
+}
 
-      border-radius: 12px;
-      font-size: 18px;
+#rollDisplay img{
+    width:120px;
+    height:120px;
+    border-radius:50%;
+    object-fit:cover;
+}
 
-      transition: 0.2s;
-      gap: 12px;
-    }
+#viewerName{
+    font-size:32px;
+    font-weight:bold;
+    margin-top:10px;
+}
 
-    .btn:hover {
-      opacity: 0.85;
-      transform: scale(1.03);
-    }
+#viewerOdds{
+    font-size:18px;
+    color:#ccc;
+}
 
-    .btn img {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-    }
-  </style>
+button{
+    padding:12px 25px;
+    font-size:18px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    margin:5px;
+}
+
+.rollBtn{
+    background:#5a67ff;
+    color:white;
+}
+
+.skipBtn{
+    background:#444;
+    color:white;
+}
+
+.panels{
+    display:flex;
+    gap:20px;
+    padding:20px;
+}
+
+.panel{
+    flex:1;
+    background:#111;
+    border-radius:15px;
+    padding:15px;
+}
+
+.inventory-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+    gap:15px;
+}
+
+.card{
+    background:#1a1a1a;
+    border-radius:12px;
+    text-align:center;
+    padding:10px;
+}
+
+.card img{
+    width:70px;
+    height:70px;
+    border-radius:50%;
+}
+
+.common{
+    box-shadow:0 0 15px gray;
+}
+
+.rare{
+    box-shadow:0 0 20px #4da6ff;
+}
+
+.epic{
+    box-shadow:0 0 25px #b84dff;
+}
+
+.legendary{
+    box-shadow:0 0 30px gold;
+}
+
+.mythic{
+    box-shadow:0 0 40px red;
+}
+
+.collection-item{
+    margin:6px 0;
+}
+
+.discovered{
+    color:#7dff7d;
+}
+
+.undiscovered{
+    color:#666;
+}
+</style>
 </head>
-
 <body>
 
-<h1>Diamond's Disciples Sonic Wave Completions</h1>
+<div class="header">
+    <h1>Viewer RNG</h1>
 
-<a class="btn" href="https://www.youtube.com/watch?v=355srCvF33g">
-  <img src="https://cdn.discordapp.com/avatars/1387440095132385300/8524135c0adafbbd6fcdc8e609bc9604.webp?size=1024">
-  brazil0987 Completion
-</a>
+    <div class="stats">
+        <div>Rolls: <span id="rolls">0</span></div>
+        <div>Best: <span id="bestRoll">None</span></div>
+    </div>
+</div>
 
-<a class="btn" href="https://www.youtube.com/watch?v=KnSxI4cJ0bc">
-  <img src="https://cdn.discordapp.com/avatars/1017419449650909286/79fb1d5b1e02703408bc27239bc71522.webp?size=1024">
-  QuickrainGD Completion
-</a>
+<div class="roll-section">
+
+    <button class="rollBtn" onclick="roll()">ROLL</button>
+    <button class="skipBtn" onclick="skipAnimation()">SKIP</button>
+
+    <div id="rollDisplay">
+        <img id="viewerImage" src="https://i.pravatar.cc/150?img=1">
+        <div id="viewerName">Press Roll</div>
+        <div id="viewerOdds"></div>
+    </div>
+
+</div>
+
+<div class="panels">
+
+    <div class="panel">
+        <h2>Inventory</h2>
+        <div class="inventory-grid" id="inventory"></div>
+    </div>
+
+    <div class="panel">
+        <h2>Collection</h2>
+        <div id="collection"></div>
+    </div>
+
+</div>
+
+<script>
+
+const viewers = [
+{
+name:"Nightbot",
+odds:2,
+image:"https://i.pravatar.cc/150?img=2"
+},
+{
+name:"RandomLurker",
+odds:4,
+image:"https://i.pravatar.cc/150?img=3"
+},
+{
+name:"Bob",
+odds:10,
+image:"https://i.pravatar.cc/150?img=4"
+},
+{
+name:"Brazil0987",
+odds:25,
+image:"https://i.pravatar.cc/150?img=5"
+},
+{
+name:"QuickrainGD",
+odds:50,
+image:"https://i.pravatar.cc/150?img=6"
+},
+{
+name:"Diamond",
+odds:1000,
+image:"https://i.pravatar.cc/150?img=7"
+},
+{
+name:"Streamer",
+odds:10000,
+image:"https://i.pravatar.cc/150?img=8"
+}
+];
+
+let inventory = JSON.parse(localStorage.getItem("inventory") || "{}");
+let discovered = JSON.parse(localStorage.getItem("discovered") || "[]");
+let rollCount = Number(localStorage.getItem("rollCount") || 0);
+let bestOdds = Number(localStorage.getItem("bestOdds") || 0);
+
+document.getElementById("rolls").textContent = rollCount;
+
+function rarityClass(odds){
+if(odds < 10) return "common";
+if(odds < 50) return "rare";
+if(odds < 250) return "epic";
+if(odds < 1000) return "legendary";
+return "mythic";
+}
+
+function pickViewer(){
+
+const sorted = [...viewers].sort((a,b)=>b.odds-a.odds);
+
+for(const viewer of sorted){
+if(Math.floor(Math.random()*viewer.odds)===0){
+return viewer;
+}
+}
+
+return viewers[0];
+}
+
+let animationRunning = false;
+let finalViewer = null;
+
+function roll(){
+
+if(animationRunning) return;
+
+animationRunning = true;
+
+rollCount++;
+document.getElementById("rolls").textContent = rollCount;
+
+let cycles = 25;
+
+const interval = setInterval(()=>{
+
+const randomViewer =
+viewers[Math.floor(Math.random()*viewers.length)];
+
+showViewer(randomViewer);
+
+cycles--;
+
+if(cycles <= 0){
+
+clearInterval(interval);
+
+finalViewer = pickViewer();
+
+showViewer(finalViewer);
+
+finishRoll(finalViewer);
+
+animationRunning = false;
+
+}
+
+},80);
+
+}
+
+function skipAnimation(){
+
+if(!animationRunning) return;
+
+animationRunning = false;
+
+finalViewer = pickViewer();
+
+showViewer(finalViewer);
+
+finishRoll(finalViewer);
+
+}
+
+function showViewer(viewer){
+
+const display = document.getElementById("rollDisplay");
+
+display.className = rarityClass(viewer.odds);
+
+document.getElementById("viewerImage").src =
+viewer.image;
+
+document.getElementById("viewerName").textContent =
+viewer.name;
+
+document.getElementById("viewerOdds").textContent =
+`1 in ${viewer.odds}`;
+
+}
+
+function finishRoll(viewer){
+
+inventory[viewer.name] =
+(inventory[viewer.name] || 0)+1;
+
+if(!discovered.includes(viewer.name))
+discovered.push(viewer.name);
+
+if(viewer.odds > bestOdds){
+
+bestOdds = viewer.odds;
+
+document.getElementById("bestRoll").textContent =
+`${viewer.name} (1/${viewer.odds})`;
+
+}
+
+save();
+renderInventory();
+renderCollection();
+
+}
+
+function renderInventory(){
+
+const div = document.getElementById("inventory");
+
+div.innerHTML = "";
+
+Object.entries(inventory).forEach(([name,count])=>{
+
+const viewer =
+viewers.find(v=>v.name===name);
+
+div.innerHTML += `
+<div class="card ${rarityClass(viewer.odds)}">
+<img src="${viewer.image}">
+<h3>${viewer.name}</h3>
+<div>1 in ${viewer.odds}</div>
+<div>x${count}</div>
+</div>
+`;
+
+});
+
+}
+
+function renderCollection(){
+
+const div =
+document.getElementById("collection");
+
+div.innerHTML = "";
+
+viewers.forEach(v=>{
+
+const found =
+discovered.includes(v.name);
+
+div.innerHTML += `
+<div class="collection-item ${found ? "discovered":"undiscovered"}">
+${found ? "✓":"?"}
+${v.name}
+(1/${v.odds})
+</div>
+`;
+
+});
+
+}
+
+function save(){
+
+localStorage.setItem(
+"inventory",
+JSON.stringify(inventory)
+);
+
+localStorage.setItem(
+"discovered",
+JSON.stringify(discovered)
+);
+
+localStorage.setItem(
+"rollCount",
+rollCount
+);
+
+localStorage.setItem(
+"bestOdds",
+bestOdds
+);
+
+}
+
+if(bestOdds > 0){
+
+const best =
+viewers.find(v=>v.odds === bestOdds);
+
+if(best){
+
+document.getElementById("bestRoll").textContent =
+`${best.name} (1/${best.odds})`;
+
+}
+
+}
+
+renderInventory();
+renderCollection();
+
+</script>
 
 </body>
 </html>
