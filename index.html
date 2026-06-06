@@ -139,6 +139,12 @@ body{
 
 <script>
 
+/* 🎛️ YOU CONTROL THIS */
+let rollDuration = 3000; // ⏱️ spin length (ms)
+
+/* 🎵 AUDIO PLACEHOLDER (NOT USED YET) */
+const AUDIO_PLACEHOLDER = "https://cdn.discordapp.com/attachments/836828986180239371/1512824863386243143/Lucky_wheel_spin_sound_effect.mp3";
+
 /* VIEWERS */
 const viewers = [
   {name:"duckwithsunnies", odds:2, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/6ef3b0ef-bc0b-463d-a3d9-1f2a646a534f-profile_image-70x70.png"},
@@ -188,6 +194,12 @@ function pick(p){
   return viewers[0];
 }
 
+/* 🔊 PLACEHOLDER SOUND (DISABLED FOR NOW) */
+function playSoundPlaceholder(){
+  // const audio = new Audio(AUDIO_PLACEHOLDER);
+  // audio.play();
+}
+
 /* ROLL */
 let running=false;
 
@@ -195,11 +207,13 @@ function roll(){
   if(running) return;
   running=true;
 
+  // optional sound hook (currently off)
+  playSoundPlaceholder();
+
   rolls++;
   document.getElementById("rolls").innerText = rolls;
 
   const start = performance.now();
-  const rollDuration = 3000; // adjust manually anytime
 
   function frame(t){
     let p = (t - start) / rollDuration;
