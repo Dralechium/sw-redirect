@@ -139,11 +139,34 @@ body{
 
 <script>
 
-/* 🎛️ YOU CONTROL THIS */
-let rollDuration = 3000; // ⏱️ spin length (ms)
+/* 🎛️ MANUAL SETTINGS */
+let rollDuration = 3000; // change spin speed here
 
-/* 🎵 AUDIO PLACEHOLDER (NOT USED YET) */
-const AUDIO_PLACEHOLDER = "https://cdn.discordapp.com/attachments/836828986180239371/1512850239701258361/Lucky_wheel_spin_sound_effect.mp3";
+/* 🎵 AUDIO PLACEHOLDER SYSTEM */
+const AUDIO_PLACEHOLDER = "https://cdn.discordapp.com/attachments/836828986180239371/1512824863386243143/Lucky_wheel_spin_sound_effect.mp3";
+
+/* ONE STABLE AUDIO OBJECT (IMPORTANT FIX) */
+let rollAudio = new Audio(AUDIO_PLACEHOLDER);
+rollAudio.preload = "auto";
+rollAudio.volume = 1;
+
+/* unlock audio on first click (browser rule) */
+document.addEventListener("click", () => {
+  rollAudio.play().then(()=>rollAudio.pause()).catch(()=>{});
+}, { once:true });
+
+function playSoundPlaceholder(){
+  rollAudio.pause();
+  rollAudio.currentTime = 0;
+
+  const playPromise = rollAudio.play();
+
+  if(playPromise !== undefined){
+    playPromise.catch(err => {
+      console.log("Audio blocked or invalid source:", err);
+    });
+  }
+}
 
 /* VIEWERS */
 const viewers = [
@@ -194,12 +217,6 @@ function pick(p){
   return viewers[0];
 }
 
-/* 🔊 PLACEHOLDER SOUND (DISABLED FOR NOW) */
-function playSoundPlaceholder(){
-  // const audio = new Audio(AUDIO_PLACEHOLDER);
-  // audio.play();
-}
-
 /* ROLL */
 let running=false;
 
@@ -207,7 +224,7 @@ function roll(){
   if(running) return;
   running=true;
 
-  // optional sound hook (currently off)
+  /* 🎵 PLAY SOUND */
   playSoundPlaceholder();
 
   rolls++;
