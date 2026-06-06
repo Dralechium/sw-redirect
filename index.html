@@ -139,9 +139,6 @@ body{
 
 <script>
 
-/* 🎛️ MANUAL CONTROL (YOU CHANGE THIS) */
-let rollDuration = 3000;
-
 /* VIEWERS */
 const viewers = [
   {name:"duckwithsunnies", odds:2, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/6ef3b0ef-bc0b-463d-a3d9-1f2a646a534f-profile_image-70x70.png"},
@@ -163,28 +160,6 @@ let rolls = Number(localStorage.getItem("rolls")||0);
 let best = Number(localStorage.getItem("best")||0);
 
 document.getElementById("rolls").innerText = rolls;
-
-/* 🔊 SOUND SYSTEM (FIXED) */
-let rollSound = new Audio(
-  "https://cdn.discordapp.com/attachments/836828986180239371/1512824863386243143/Lucky_wheel_spin_sound_effect.mp3"
-);
-
-rollSound.preload = "auto";
-rollSound.volume = 1;
-
-/* unlock audio on first interaction (browser fix) */
-document.addEventListener("click", () => {
-  rollSound.play().then(()=>rollSound.pause()).catch(()=>{});
-}, { once:true });
-
-function playSound(){
-  rollSound.pause();
-  rollSound.currentTime = 0;
-
-  rollSound.play().catch(err=>{
-    console.log("Audio blocked until interaction:", err);
-  });
-}
 
 /* RARITY */
 function rarity(o){
@@ -220,12 +195,11 @@ function roll(){
   if(running) return;
   running=true;
 
-  playSound();
-
   rolls++;
   document.getElementById("rolls").innerText = rolls;
 
   const start = performance.now();
+  const rollDuration = 3000; // adjust manually anytime
 
   function frame(t){
     let p = (t - start) / rollDuration;
@@ -233,11 +207,6 @@ function roll(){
 
     let curve = 1 - Math.pow(1 - p, 4);
     let delay = 35 + (220 * curve);
-
-    if(Math.random() < 0.6){
-      rollSound.currentTime = 0;
-      rollSound.play().catch(()=>{});
-    }
 
     if(p < 1){
 
@@ -252,9 +221,6 @@ function roll(){
       show(final);
       finish(final);
       running = false;
-
-      rollSound.pause();
-      rollSound.currentTime = 0;
     }
   }
 
