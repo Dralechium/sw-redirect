@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Viewer RNG</title>
+<title>theos RNG</title>
 
 <style>
 body{
@@ -11,7 +11,10 @@ body{
   background:#0b0b0b;
   color:white;
 }
-
+.header h1{
+  color:#42ff29;
+  text-shadow:0 0 10px #42ff29;
+}
 .header{
   text-align:center;
   padding:15px;
@@ -167,7 +170,7 @@ body{
 <body>
 
 <div class="header">
-  <h1>Viewer RNG</h1>
+  <h1>theos RNG</h1>
 
   <div class="stats">
     <div>Rolls: <span id="rolls">0</span></div>
@@ -209,7 +212,7 @@ const viewers = [
 /* DATA */
 let inventory = JSON.parse(localStorage.getItem("inv")||"{}");
 let rolls = Number(localStorage.getItem("rolls")||0);
-let best = Number(localStorage.getItem("best")||0);
+let best = JSON.parse(localStorage.getItem("best")) || null;
 
 document.getElementById("rolls").innerText = rolls;
 
@@ -290,13 +293,22 @@ function show(v){
 }
 /* FINISH */
 function finish(v){
+
   inventory[v.name] = (inventory[v.name] || 0) + 1;
 
-  if(v.odds > best){
-    best = v.odds;
+  if(!best || v.odds > best.odds){
+    best = {
+      name: v.name,
+      odds: v.odds
+    };
+
     document.getElementById("best").innerText =
-      v.name + " (1/" + v.odds + ")";
+      `${best.name} (1/${best.odds})`;
   }
+
+  save();
+  render();
+}
 
   save();
   render();
@@ -325,7 +337,7 @@ function render(){
 function save(){
   localStorage.setItem("inv", JSON.stringify(inventory));
   localStorage.setItem("rolls", rolls);
-  localStorage.setItem("best", best);
+  localStorage.setItem("best", JSON.stringify(best));
 }
 
 render();
