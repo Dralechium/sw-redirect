@@ -46,16 +46,21 @@ body{
   pointer-events:none;
 }
 
-#rollBox{ justify-self:start; color:#42ff29; }
-#bestBox{ justify-self:end; }
+#rollBox{
+  color:#42ff29;
+  justify-self:start;
+}
 
-/* CENTER */
+#bestBox{
+  justify-self:end;
+}
+/* CENTER AREA */
 .roll-area{
   text-align:center;
   padding:30px;
 }
 
-/* DISPLAY */
+/* ROLL DISPLAY */
 #display{
   width:360px;
   margin:20px auto;
@@ -115,31 +120,48 @@ body{
   border-radius:50%;
 }
 
-/* rarity colors */
-.card.common{ box-shadow:0 0 8px gray; }
-.card.rare{ box-shadow:0 0 12px #4da6ff; }
-.card.epic{ box-shadow:0 0 18px #b84dff; }
-.card.legendary{ box-shadow:0 0 25px gold; }
-.card.mythic{ box-shadow:0 0 35px red; }
+/* rarity glow + color themes */
+.card.common{ box-shadow:0 0 8px gray; background:linear-gradient(145deg,#1a1a1a,#2a2a2a); }
+.card.rare{ box-shadow:0 0 12px #4da6ff; background:linear-gradient(145deg,#0b1a2a,#123a66); }
+.card.epic{ box-shadow:0 0 18px #b84dff; background:linear-gradient(145deg,#1a0b2a,#3a1266); }
+.card.legendary{ box-shadow:0 0 25px gold; background:linear-gradient(145deg,#2a220b,#665012); }
+.card.mythic{ box-shadow:0 0 35px red; background:linear-gradient(145deg,#2a0b0b,#661212); }
 
-/* LOCKED CLEAN STYLE */
-.card.locked img{
+/* PREVIEW SCREEN RARITIES */
+#display.common{ background:linear-gradient(145deg,#1a1a1a,#2a2a2a); box-shadow:0 0 15px gray; }
+#display.rare{ background:linear-gradient(145deg,#0b1a2a,#123a66); box-shadow:0 0 20px #4da6ff; }
+#display.epic{ background:linear-gradient(145deg,#1a0b2a,#3a1266); box-shadow:0 0 25px #b84dff; }
+#display.legendary{ background:linear-gradient(145deg,#2a220b,#665012); box-shadow:0 0 30px gold; }
+#display.mythic{ background:linear-gradient(145deg,#2a0b0b,#661212); box-shadow:0 0 40px red; }
+
+/* locked */
+.locked img{
   filter:blur(8px) grayscale(1);
-  transform:scale(1.05);
+  transform:scale(1.1);
 }
 
-/* centered locked text */
-.lockedName{
+.card{
+  position:relative;
+}
+
+/* dark overlay for locked cards */
+.card.locked::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,0.6);
+  backdrop-filter: blur(2px);
+}
+
+/* centered lock icon */
+.card.locked::before{
+  content:"🔒";
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
   font-size:26px;
-  font-weight:bold;
-  letter-spacing:2px;
-  margin-top:10px;
-}
-
-.lockedText{
-  font-size:14px;
-  color:#aaa;
-  margin-top:4px;
+  z-index:2;
 }
 
 .card:hover{
@@ -151,15 +173,28 @@ body{
 
 <body>
 
+<!-- HEADER -->
 <div class="header">
+
   <div class="hud">
-    <div class="hudBox" id="rollBox">Rolls: <span id="rolls">0</span></div>
+
+    <div class="hudBox" id="rollBox">
+      Rolls: <span id="rolls">0</span>
+    </div>
+
     <h1>theos RNG</h1>
-    <div class="hudBox" id="bestBox">Best: <span id="best">None</span></div>
+
+    <div class="hudBox" id="bestBox">
+      Best: <span id="best">None</span>
+    </div>
+
   </div>
+
 </div>
 
+<!-- GAME -->
 <div class="roll-area">
+
   <div id="display">
     <img id="img" src="https://i.pravatar.cc/150">
     <div id="name">Press Roll</div>
@@ -167,8 +202,10 @@ body{
   </div>
 
   <button class="rollBtn" onclick="roll()">ROLL</button>
+
 </div>
 
+<!-- INVENTORY -->
 <div id="inventory" class="grid"></div>
 
 <script>
@@ -191,13 +228,14 @@ const viewers = [
 const defaultViewer = viewers[viewers.length - 1];
 
 /* DATA */
-let inventory = JSON.parse(localStorage.getItem("inv") || "{}");
-let rolls = Number(localStorage.getItem("rolls") || 0);
+let inventory = JSON.parse(localStorage.getItem("inv")||"{}");
+let rolls = Number(localStorage.getItem("rolls")||0);
 let best = JSON.parse(localStorage.getItem("best")) || null;
 
 document.getElementById("rolls").innerText = rolls;
 if(best){
-  document.getElementById("best").innerText = `${best.name} (1/${best.odds})`;
+  document.getElementById("best").innerText =
+    `${best.name} (1/${best.odds})`;
 }
 
 /* RARITY */
@@ -211,7 +249,18 @@ function rarity(o){
 
 /* RNG */
 function pick(){
-  return viewers[Math.floor(Math.random()*viewers.length)];
+  // weighted selection so commons appear more often during flicker
+  const weights = viewers.map(v => 1 / v.odds);
+
+  let total = weights.reduce((a,b)=>a+b,0);
+  let r = Math.random() * total;
+
+  for(let i = 0; i < viewers.length; i++){
+    r -= weights[i];
+    if(r <= 0) return viewers[i];
+  }
+
+  return viewers[0];
 }
 
 /* ROLL */
@@ -227,6 +276,26 @@ function roll(){
   const start = performance.now();
   const rollDuration = 3000;
 
+  function visualPick(){
+    return viewers[Math.floor(Math.random() * viewers.length)];
+  }
+
+  function weightedPick(){
+    let total = 0;
+
+    for (let v of viewers) {
+      total += 1 / v.odds;
+    }
+
+    let r = Math.random() * total;
+
+    let acc = 0;
+    for (let v of viewers) {
+      acc += 1 / v.odds;
+      if (r <= acc) return v;
+    }
+  }
+
   function frame(t){
     let p = (t - start) / rollDuration;
     if(p > 1) p = 1;
@@ -234,11 +303,13 @@ function roll(){
     let delay = 35 + (220 * p);
 
     if(p < 1){
-      let v = pick();
+      let v = visualPick();
       show(v);
-      setTimeout(()=>requestAnimationFrame(frame), delay);
+
+      setTimeout(() => requestAnimationFrame(frame), delay);
+
     } else {
-      let final = pick();
+      let final = weightedPick();
       show(final);
       finish(final);
       running = false;
@@ -256,17 +327,24 @@ function show(v){
   document.getElementById("name").innerText = v.name;
   document.getElementById("odds").innerText = "1 in " + v.odds;
 
+  // IMPORTANT: fully reset classes every time
   display.className = "";
-  display.classList.add(rarity(v.odds));
+
+  // re-apply correct rarity class
+  const r = rarity(v.odds);
+  display.classList.add(r);
 }
 
 /* FINISH */
 function finish(v){
+
   inventory[v.name] = (inventory[v.name] || 0) + 1;
 
   if(!best || v.odds > best.odds){
     best = { name:v.name, odds:v.odds };
-    document.getElementById("best").innerText = `${best.name} (1/${best.odds})`;
+
+    document.getElementById("best").innerText =
+      `${best.name} (1/${best.odds})`;
   }
 
   save();
@@ -284,12 +362,9 @@ function render(){
     inv.innerHTML += `
       <div class="card ${owned ? rarity(v.odds) : "locked"}">
         <img src="${owned ? v.image : "https://i.imgur.com/8QfQ3vR.png"}">
-
-        ${
-          owned
-          ? `<div>${v.name}</div><div>1 in ${v.odds}</div><div>x${owned}</div>`
-          : `<div class="lockedName">???</div><div class="lockedText">Locked</div>`
-        }
+        <div>${owned ? v.name : "???"}</div>
+        <div>${owned ? "1 in "+v.odds : "Locked"}</div>
+        <div>${owned ? "x"+owned : ""}</div>
       </div>
     `;
   }
