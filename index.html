@@ -263,28 +263,25 @@ function roll(){
   const start = performance.now();
   const rollDuration = 3000;
 
-function frame(t){
-  let p = (t - start) / rollDuration;
-  if(p > 1) p = 1;
+  function frame(t){
+    let p = (t - start) / rollDuration;
+    if(p > 1) p = 1;
 
-  let delay = 35 + (220 * p);
+    let delay = 35 + (220 * p);
 
-  if(p < 1){
-
-    // 🔥 VISUAL ONLY (chaotic flicker)
-    let v = visualPick();
-    show(v);
-
-    setTimeout(()=>requestAnimationFrame(frame), delay);
-
-  } else {
-
-    // 🎯 FINAL RESULT (real odds)
-    let final = weightedPick();
-    show(final);
-    finish(final);
-    running = false;
+    if(p < 1){
+      let v = pick();
+      show(v);
+      setTimeout(()=>requestAnimationFrame(frame), delay);
+    } else {
+      let final = pick();
+      show(final);
+      finish(final);
+      running = false;
+    }
   }
+
+  requestAnimationFrame(frame);
 }
 
 /* SHOW */
