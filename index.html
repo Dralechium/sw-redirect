@@ -144,28 +144,36 @@ body{
   position:relative;
 }
 
-/* dark overlay for locked cards */
-.card.locked::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:rgba(0,0,0,0.6);
-  backdrop-filter: blur(2px);
-}
-
-/* centered lock icon */
-.card.locked::before{
-  content:"🔒";
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  font-size:26px;
-  z-index:2;
-}
-
 .card:hover{
   transform: scale(1.03);
+}
+
+/* LOCKED STATE (NEW SYSTEM) */
+.card.locked{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  position:relative;
+}
+
+.card.locked img{
+  filter:blur(8px) grayscale(1);
+  transform:scale(1.1);
+}
+
+/* big ??? in center */
+.lockedText{
+  font-size:28px;
+  font-weight:bold;
+  letter-spacing:2px;
+}
+
+/* "Locked" text under it */
+.lockedSub{
+  font-size:14px;
+  color:#aaa;
 }
 
 </style>
@@ -360,13 +368,20 @@ function render(){
     let owned = inventory[v.name];
 
     inv.innerHTML += `
-      <div class="card ${owned ? rarity(v.odds) : "locked"}">
-        <img src="${owned ? v.image : "https://i.imgur.com/8QfQ3vR.png"}">
-        <div>${owned ? v.name : "???"}</div>
-        <div>${owned ? "1 in "+v.odds : "Locked"}</div>
-        <div>${owned ? "x"+owned : ""}</div>
-      </div>
-    `;
+  <div class="card ${owned ? rarity(v.odds) : "locked"}">
+    
+    ${owned ? `
+      <img src="${v.image}">
+      <div>${v.name}</div>
+      <div>1 in ${v.odds}</div>
+      <div>x${owned}</div>
+    ` : `
+      <div class="lockedText">???</div>
+      <div class="lockedSub">Locked</div>
+    `}
+    
+  </div>
+`;
   }
 }
 
