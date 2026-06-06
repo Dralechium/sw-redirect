@@ -140,12 +140,28 @@ body{
   transform:scale(1.1);
 }
 
-.lockIcon{
+.card{
+  position:relative;
+}
+
+/* dark overlay for locked cards */
+.card.locked::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,0.6);
+  backdrop-filter: blur(2px);
+}
+
+/* centered lock icon */
+.card.locked::before{
+  content:"🔒";
   position:absolute;
   top:50%;
   left:50%;
   transform:translate(-50%,-50%);
   font-size:26px;
+  z-index:2;
 }
 
 .card:hover{
@@ -233,18 +249,15 @@ function rarity(o){
 
 /* RNG */
 function pick(){
-  let totalWeight = 0;
+  // weighted selection so commons appear more often during flicker
+  const weights = viewers.map(v => 1 / v.odds);
 
-  for (let v of viewers) {
-    totalWeight += 1 / v.odds;
-  }
+  let total = weights.reduce((a,b)=>a+b,0);
+  let r = Math.random() * total;
 
-  let r = Math.random() * totalWeight;
-
-  let acc = 0;
-  for (let v of viewers) {
-    acc += 1 / v.odds;
-    if (r <= acc) return v;
+  for(let i = 0; i < viewers.length; i++){
+    r -= weights[i];
+    if(r <= 0) return viewers[i];
   }
 
   return viewers[0];
@@ -349,7 +362,6 @@ function render(){
     inv.innerHTML += `
       <div class="card ${owned ? rarity(v.odds) : "locked"}">
         <img src="${owned ? v.image : "https://i.imgur.com/8QfQ3vR.png"}">
-        ${!owned ? '<div class="lockIcon">🔒</div>' : ""}
         <div>${owned ? v.name : "???"}</div>
         <div>${owned ? "1 in "+v.odds : "Locked"}</div>
         <div>${owned ? "x"+owned : ""}</div>
