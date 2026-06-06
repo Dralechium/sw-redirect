@@ -208,7 +208,7 @@ const viewers = [
   {name:"Christ_Is_God", odds:5000, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/98b31c09-fa8b-4318-88bd-ef8a0443b772-profile_image-70x70.png"},
   {name:"theosGMD", odds:10000, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/0ffc8233-6b32-411e-bfbd-4167c09cc2a2-profile_image-70x70.png"}
 ];
-
+const defaultViewer = viewers[viewers.length - 1];
 /* DATA */
 let inventory = JSON.parse(localStorage.getItem("inv")||"{}");
 let rolls = Number(localStorage.getItem("rolls")||0);
@@ -338,7 +338,11 @@ function save(){
   localStorage.setItem("rolls", rolls);
   localStorage.setItem("best", JSON.stringify(best));
 }
-
+show(defaultViewer);
+document.getElementById("odds").innerText = "1 in " + defaultViewer.odds;
+document.getElementById("name").innerText = defaultViewer.name;
+document.getElementById("img").src = defaultViewer.image;
+document.getElementById("display").className = rarity(defaultViewer.odds);
 render();
 
 </script>
