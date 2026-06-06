@@ -95,7 +95,7 @@ body{
 .legendary{ box-shadow:0 0 25px gold; }
 .mythic{ box-shadow:0 0 35px red; }
 
-/* locked cards */
+/* locked */
 .locked img{
   filter:blur(8px) grayscale(1);
   transform:scale(1.1);
@@ -116,6 +116,7 @@ body{
 
 <div class="header">
   <h1>Viewer RNG</h1>
+
   <div class="stats">
     <div>Rolls: <span id="rolls">0</span></div>
     <div>Best: <span id="best">None</span></div>
@@ -160,14 +161,18 @@ let best = Number(localStorage.getItem("best")||0);
 
 document.getElementById("rolls").innerText = rolls;
 
-/* SOUND */
-let rollSound = new Audio("https://cdn.discordapp.com/attachments/836828986180239371/1512824863386243143/Lucky_wheel_spin_sound_effect.mp3");
+/* 🎵 AUDIO (FIXED DISCORD VERSION) */
+let rollSound = new Audio();
+rollSound.src = "https://cdn.discordapp.com/attachments/836828986180239371/1512824863386243143/Lucky_wheel_spin_sound_effect.mp3";
+rollSound.preload = "auto";
+rollSound.load();
+
 let tickSound = new Audio("https://www.myinstants.com/media/sounds/click.mp3");
 
 let rollDuration = 3000;
 
-rollSound.addEventListener("loadedmetadata", () => {
-  if(!isNaN(rollSound.duration)){
+rollSound.addEventListener("canplaythrough", () => {
+  if (!isNaN(rollSound.duration) && rollSound.duration > 0) {
     rollDuration = rollSound.duration * 1000;
   }
 });
@@ -181,20 +186,19 @@ function rarity(o){
   return "mythic";
 }
 
-/* RNG WITH DROP BOOST */
+/* RNG + DROP ZONE BOOST */
 function pick(p){
   const sorted=[...viewers].sort((a,b)=>b.odds-a.odds);
 
   let dropZone = p > 0.7 && p < 0.9;
 
   for(let v of sorted){
-    let roll = Math.random();
 
     if(dropZone && v.odds >= 100){
       if(Math.random() < 1/(v.odds/2)) return v;
     }
 
-    if(Math.floor(roll * v.odds) === 0) return v;
+    if(Math.floor(Math.random()*v.odds)===0) return v;
   }
 
   return viewers[0];
@@ -207,6 +211,8 @@ function roll(){
   if(running) return;
   running=true;
 
+  /* SOUND START */
+  rollSound.pause();
   rollSound.currentTime=0;
   rollSound.play().catch(()=>{});
 
@@ -222,6 +228,7 @@ function roll(){
     let curve = 1 - Math.pow(1 - p, 4);
     let delay = 35 + (220 * curve);
 
+    /* tick sound slows with roll */
     if(Math.random()<0.6){
       tickSound.currentTime=0;
       tickSound.play().catch(()=>{});
