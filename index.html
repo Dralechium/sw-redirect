@@ -215,7 +215,10 @@ let rolls = Number(localStorage.getItem("rolls")||0);
 let best = JSON.parse(localStorage.getItem("best")) || null;
 
 document.getElementById("rolls").innerText = rolls;
-
+if(best){
+  document.getElementById("best").innerText =
+    `${best.name} (1/${best.odds})`;
+}
 /* RARITY */
 function rarity(o){
   if(o<=5) return "common";
