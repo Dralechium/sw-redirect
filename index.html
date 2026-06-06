@@ -233,7 +233,21 @@ function rarity(o){
 
 /* RNG */
 function pick(){
-  return viewers[Math.floor(Math.random()*viewers.length)];
+  let totalWeight = 0;
+
+  for (let v of viewers) {
+    totalWeight += 1 / v.odds;
+  }
+
+  let r = Math.random() * totalWeight;
+
+  let acc = 0;
+  for (let v of viewers) {
+    acc += 1 / v.odds;
+    if (r <= acc) return v;
+  }
+
+  return viewers[0];
 }
 
 /* ROLL */
