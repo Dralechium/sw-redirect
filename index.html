@@ -23,10 +23,8 @@ body{
   display:flex;
   justify-content:center;
   gap:40px;
-  margin-top:10px;
 }
 
-/* ROLL AREA */
 .roll-area{
   text-align:center;
   padding:30px;
@@ -54,40 +52,25 @@ body{
   margin-top:10px;
 }
 
-#odds{
-  color:#aaa;
-}
+#odds{ color:#aaa; }
 
-/* BIG ROLL BUTTON */
 .rollBtn{
-  padding:18px 60px;
+  padding:18px 70px;
   font-size:20px;
   border:none;
   border-radius:12px;
   cursor:pointer;
   background:#5865F2;
   color:white;
-  margin-top:10px;
+  margin-top:15px;
 }
 
-/* PANELS */
-.panels{
-  display:flex;
-  gap:20px;
-  padding:20px;
-}
-
-.panel{
-  flex:1;
-  background:#111;
-  border-radius:15px;
-  padding:15px;
-}
-
+/* INVENTORY GRID */
 .grid{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
   gap:10px;
+  padding:20px;
 }
 
 .card{
@@ -95,6 +78,7 @@ body{
   border-radius:12px;
   text-align:center;
   padding:10px;
+  transition:0.3s;
 }
 
 .card img{
@@ -103,15 +87,17 @@ body{
   border-radius:50%;
 }
 
-/* RARITIES */
-.common{ box-shadow:0 0 10px gray; }
-.rare{ box-shadow:0 0 15px #4da6ff; }
-.epic{ box-shadow:0 0 20px #b84dff; }
+/* rarity glow */
+.common{ box-shadow:0 0 8px gray; }
+.rare{ box-shadow:0 0 12px #4da6ff; }
+.epic{ box-shadow:0 0 18px #b84dff; }
 .legendary{ box-shadow:0 0 25px gold; }
 .mythic{ box-shadow:0 0 35px red; }
 
-.discovered{ color:#7CFF7C; }
-.undiscovered{ color:#666; }
+.locked{
+  filter:grayscale(1);
+  opacity:0.4;
+}
 
 </style>
 </head>
@@ -138,19 +124,7 @@ body{
 
 </div>
 
-<div class="panels">
-
-  <div class="panel">
-    <h2>Inventory</h2>
-    <div class="grid" id="inv"></div>
-  </div>
-
-  <div class="panel">
-    <h2>Collection</h2>
-    <div id="col"></div>
-  </div>
-
-</div>
+<div id="inventory" class="grid"></div>
 
 <script>
 
@@ -176,16 +150,7 @@ let best = Number(localStorage.getItem("best")||0);
 
 document.getElementById("rolls").innerText = rolls;
 
-/* RARITY */
-function rarity(o){
-  if(o<=5) return "common";
-  if(o<=25) return "rare";
-  if(o<=100) return "epic";
-  if(o<=1000) return "legendary";
-  return "mythic";
-}
-
-/* TRUE RNG */
+/* RNG */
 function pick(){
   const sorted=[...viewers].sort((a,b)=>b.odds-a.odds);
   for(let v of sorted){
@@ -194,42 +159,44 @@ function pick(){
   return viewers[0];
 }
 
-/* FIXED FAST → SLOW ROLL */
+/* SOUND */
+let audio = new Audio("https://www.myinstants.com/media/sounds/sols-rng-30234.mp3");
+
 let running=false;
 
 function roll(){
   if(running) return;
   running=true;
 
+  audio.currentTime=0;
+  audio.play();
+
   rolls++;
   document.getElementById("rolls").innerText=rolls;
 
-  const duration = 2600;
-  const start = performance.now();
+  let duration=3000;
+  let start=performance.now();
 
-  function frame(time){
-    const progress = (time - start) / duration;
+  function frame(t){
+    let p=(t-start)/duration;
 
-    // smooth slow-down (FAST → SLOW)
-    const easeOut = 1 - Math.pow(1 - Math.min(progress,1), 3);
+    let ease=1-Math.pow(1-p,3);
 
-    const minDelay = 40;
-    const maxDelay = 220;
-    const delay = minDelay + (maxDelay - minDelay) * easeOut;
+    let delay=40+(180*ease);
 
-    if(progress < 1){
+    if(p<1){
 
-      const v = viewers[Math.floor(Math.random()*viewers.length)];
+      let v=viewers[Math.floor(Math.random()*viewers.length)];
       show(v);
 
-      setTimeout(()=>requestAnimationFrame(frame), delay);
+      setTimeout(()=>requestAnimationFrame(frame),delay);
 
     } else {
 
-      const final = pick();
+      let final=pick();
       show(final);
       finish(final);
-      running = false;
+      running=false;
     }
   }
 
@@ -241,7 +208,6 @@ function show(v){
   document.getElementById("img").src=v.image;
   document.getElementById("name").innerText=v.name;
   document.getElementById("odds").innerText="1 in "+v.odds;
-  document.getElementById("display").className=rarity(v.odds);
 }
 
 /* FINISH */
@@ -261,40 +227,33 @@ save();
 render();
 }
 
-/* INVENTORY SORT LOW → HIGH RARITY */
+/* INVENTORY WITH LOCKED CARDS */
 function render(){
 
-let inv=document.getElementById("inv");
+let inv=document.getElementById("inventory");
 inv.innerHTML="";
 
-let entries=Object.entries(inventory)
-.sort((a,b)=>{
-return viewers.find(v=>v.name===a[0]).odds -
-       viewers.find(v=>v.name===b[0]).odds;
-});
+for(let v of viewers){
 
-for(let [name,count] of entries){
-let v=viewers.find(x=>x.name===name);
+let owned=inventory[v.name];
 
 inv.innerHTML+=`
-<div class="card ${rarity(v.odds)}">
-<img src="${v.image}">
-<div>${v.name}</div>
-<div>1 in ${v.odds}</div>
-<div>x${count}</div>
+<div class="card ${rarity(v.odds)} ${owned?"" :"locked"}">
+<img src="${owned?v.image:"https://i.imgur.com/8QfQ3vR.png"}">
+<div>${owned?v.name:"???"}</div>
+<div>${owned?"1 in "+v.odds:"Locked"}</div>
+<div>${owned?"x"+owned:""}</div>
 </div>`;
 }
 
-let col=document.getElementById("col");
-col.innerHTML="";
+}
 
-viewers.forEach(v=>{
-col.innerHTML+=`
-<div class="${discovered.includes(v.name)?"discovered":"undiscovered"}">
-${discovered.includes(v.name)?"✓":"?"} ${v.name} (1/${v.odds})
-</div>`;
-});
-
+function rarity(o){
+if(o<=5) return "common";
+if(o<=25) return "rare";
+if(o<=100) return "epic";
+if(o<=1000) return "legendary";
+return "mythic";
 }
 
 function save(){
