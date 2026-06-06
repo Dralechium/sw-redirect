@@ -6,431 +6,306 @@
 
 <style>
 body{
-    margin:0;
-    background:#0b0b0b;
-    color:white;
-    font-family:Arial,sans-serif;
+  margin:0;
+  font-family:Arial;
+  background:#0b0b0b;
+  color:white;
 }
 
+/* HEADER */
 .header{
-    text-align:center;
-    padding:20px;
-    background:#111;
-    border-bottom:2px solid #222;
+  text-align:center;
+  padding:15px;
+  background:#111;
+  border-bottom:2px solid #222;
 }
 
 .stats{
-    display:flex;
-    justify-content:center;
-    gap:40px;
-    margin-top:10px;
+  display:flex;
+  justify-content:center;
+  gap:40px;
+  margin-top:10px;
 }
 
-.roll-section{
-    text-align:center;
-    padding:40px;
+/* ROLL AREA */
+.roll-area{
+  text-align:center;
+  padding:30px;
 }
 
-#rollDisplay{
-    width:350px;
-    margin:30px auto;
-    padding:20px;
-    border-radius:15px;
-    background:#181818;
-    transition:.3s;
+#display{
+  width:360px;
+  margin:20px auto;
+  padding:20px;
+  border-radius:15px;
+  background:#181818;
+  transition:0.3s;
 }
 
-#rollDisplay img{
-    width:120px;
-    height:120px;
-    border-radius:50%;
-    object-fit:cover;
+#display img{
+  width:120px;
+  height:120px;
+  border-radius:50%;
+  object-fit:cover;
 }
 
-#viewerName{
-    font-size:32px;
-    font-weight:bold;
-    margin-top:10px;
+#name{
+  font-size:28px;
+  font-weight:bold;
+  margin-top:10px;
 }
 
-#viewerOdds{
-    font-size:18px;
-    color:#ccc;
+#odds{
+  color:#aaa;
 }
 
 button{
-    padding:12px 25px;
-    font-size:18px;
-    border:none;
-    border-radius:10px;
-    cursor:pointer;
-    margin:5px;
+  padding:12px 20px;
+  margin:5px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  font-size:16px;
 }
 
-.rollBtn{
-    background:#5a67ff;
-    color:white;
-}
+.rollBtn{ background:#5865F2; color:white; }
+.skipBtn{ background:#333; color:white; }
 
-.skipBtn{
-    background:#444;
-    color:white;
-}
-
+/* PANELS */
 .panels{
-    display:flex;
-    gap:20px;
-    padding:20px;
+  display:flex;
+  gap:20px;
+  padding:20px;
 }
 
 .panel{
-    flex:1;
-    background:#111;
-    border-radius:15px;
-    padding:15px;
+  flex:1;
+  background:#111;
+  border-radius:15px;
+  padding:15px;
 }
 
-.inventory-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
-    gap:15px;
+/* INVENTORY GRID */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:10px;
 }
 
 .card{
-    background:#1a1a1a;
-    border-radius:12px;
-    text-align:center;
-    padding:10px;
+  background:#1a1a1a;
+  border-radius:12px;
+  text-align:center;
+  padding:10px;
 }
 
 .card img{
-    width:70px;
-    height:70px;
-    border-radius:50%;
+  width:70px;
+  height:70px;
+  border-radius:50%;
 }
 
-.common{
-    box-shadow:0 0 15px gray;
-}
-
-.rare{
-    box-shadow:0 0 20px #4da6ff;
-}
-
-.epic{
-    box-shadow:0 0 25px #b84dff;
-}
-
-.legendary{
-    box-shadow:0 0 30px gold;
-}
-
-.mythic{
-    box-shadow:0 0 40px red;
-}
+/* RARITY GLOWS */
+.common{ box-shadow:0 0 10px gray; }
+.rare{ box-shadow:0 0 15px #4da6ff; }
+.epic{ box-shadow:0 0 20px #b84dff; }
+.legendary{ box-shadow:0 0 25px gold; }
+.mythic{ box-shadow:0 0 35px red; }
 
 .collection-item{
-    margin:6px 0;
+  margin:5px 0;
 }
 
-.discovered{
-    color:#7dff7d;
-}
+.discovered{ color:#7CFF7C; }
+.undiscovered{ color:#666; }
 
-.undiscovered{
-    color:#666;
-}
 </style>
 </head>
+
 <body>
 
 <div class="header">
-    <h1>Viewer RNG</h1>
-
-    <div class="stats">
-        <div>Rolls: <span id="rolls">0</span></div>
-        <div>Best: <span id="bestRoll">None</span></div>
-    </div>
+  <h1>Viewer RNG</h1>
+  <div class="stats">
+    <div>Rolls: <span id="rolls">0</span></div>
+    <div>Best: <span id="best">None</span></div>
+  </div>
 </div>
 
-<div class="roll-section">
+<div class="roll-area">
 
-    <button class="rollBtn" onclick="roll()">ROLL</button>
-    <button class="skipBtn" onclick="skipAnimation()">SKIP</button>
+  <button class="rollBtn" onclick="roll()">ROLL</button>
+  <button class="skipBtn" onclick="skip()">SKIP</button>
 
-    <div id="rollDisplay">
-        <img id="viewerImage" src="https://i.pravatar.cc/150?img=1">
-        <div id="viewerName">Press Roll</div>
-        <div id="viewerOdds"></div>
-    </div>
+  <div id="display">
+    <img id="img" src="https://i.pravatar.cc/150">
+    <div id="name">Press Roll</div>
+    <div id="odds"></div>
+  </div>
 
 </div>
 
 <div class="panels">
 
-    <div class="panel">
-        <h2>Inventory</h2>
-        <div class="inventory-grid" id="inventory"></div>
-    </div>
+  <div class="panel">
+    <h2>Inventory</h2>
+    <div class="grid" id="inv"></div>
+  </div>
 
-    <div class="panel">
-        <h2>Collection</h2>
-        <div id="collection"></div>
-    </div>
+  <div class="panel">
+    <h2>Collection</h2>
+    <div id="col"></div>
+  </div>
 
 </div>
 
 <script>
 
+/* YOUR VIEWERS */
 const viewers = [
-{
-name:"Nightbot",
-odds:2,
-image:"https://i.pravatar.cc/150?img=2"
-},
-{
-name:"RandomLurker",
-odds:4,
-image:"https://i.pravatar.cc/150?img=3"
-},
-{
-name:"Bob",
-odds:10,
-image:"https://i.pravatar.cc/150?img=4"
-},
-{
-name:"Brazil0987",
-odds:25,
-image:"https://i.pravatar.cc/150?img=5"
-},
-{
-name:"QuickrainGD",
-odds:50,
-image:"https://i.pravatar.cc/150?img=6"
-},
-{
-name:"Diamond",
-odds:1000,
-image:"https://i.pravatar.cc/150?img=7"
-},
-{
-name:"Streamer",
-odds:10000,
-image:"https://i.pravatar.cc/150?img=8"
-}
+  {name:"duckwithsunnies", odds:2, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/6ef3b0ef-bc0b-463d-a3d9-1f2a646a534f-profile_image-70x70.png"},
+  {name:"ilee_ez", odds:4, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/e0efcfce-7516-4589-9bcf-5c6ec63a8a76-profile_image-70x70.png"},
+  {name:"ztatsukii_", odds:8, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/4fd5ffe5-6799-4f4e-b470-f1420f1caee4-profile_image-70x70.jpeg"},
+  {name:"Shunkohh", odds:16, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/2a1751b4-a94c-4c97-9fa7-3168b6a2768f-profile_image-70x70.png"},
+  {name:"41unc", odds:25, image:"https://cdn.discordapp.com/avatars/820266716537815040/396a0ee557222daf4c58ed975aad5e59.webp?size=1024"},
+  {name:"AbyssFDK", odds:50, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/84332b83-3f01-4ce3-9860-abb0a671fb5c-profile_image-70x70.jpeg"},
+  {name:"gmdbon", odds:100, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/45da4302-a7a6-4bc8-a320-f7ebac40d84f-profile_image-70x70.png"},
+  {name:"midgatal", odds:500, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/bc185f86-30d2-4422-b547-5f4e3c504d54-profile_image-70x70.png"},
+  {name:"IVDrale", odds:1000, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/6e71f426-65ca-4914-b6e8-0e5499f032cb-profile_image-70x70.png"},
+  {name:"Christ_Is_God", odds:5000, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/98b31c09-fa8b-4318-88bd-ef8a0443b772-profile_image-70x70.png"},
+  {name:"theosGMD", odds:10000, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/0ffc8233-6b32-411e-bfbd-4167c09cc2a2-profile_image-70x70.png"}
 ];
 
-let inventory = JSON.parse(localStorage.getItem("inventory") || "{}");
-let discovered = JSON.parse(localStorage.getItem("discovered") || "[]");
-let rollCount = Number(localStorage.getItem("rollCount") || 0);
-let bestOdds = Number(localStorage.getItem("bestOdds") || 0);
+let inventory = JSON.parse(localStorage.getItem("inv")||"{}");
+let discovered = JSON.parse(localStorage.getItem("col")||"[]");
+let rolls = Number(localStorage.getItem("rolls")||0);
+let best = Number(localStorage.getItem("best")||0);
 
-document.getElementById("rolls").textContent = rollCount;
+document.getElementById("rolls").innerText = rolls;
 
-function rarityClass(odds){
-if(odds < 10) return "common";
-if(odds < 50) return "rare";
-if(odds < 250) return "epic";
-if(odds < 1000) return "legendary";
-return "mythic";
+/* RARITY CLASS */
+function rarity(o){
+  if(o<=5) return "common";
+  if(o<=25) return "rare";
+  if(o<=100) return "epic";
+  if(o<=1000) return "legendary";
+  return "mythic";
 }
 
-function pickViewer(){
-
-const sorted = [...viewers].sort((a,b)=>b.odds-a.odds);
-
-for(const viewer of sorted){
-if(Math.floor(Math.random()*viewer.odds)===0){
-return viewer;
-}
-}
-
-return viewers[0];
+/* TRUE RNG SYSTEM */
+function pick(){
+  const sorted = [...viewers].sort((a,b)=>b.odds-a.odds);
+  for(let v of sorted){
+    if(Math.floor(Math.random()*v.odds)===0) return v;
+  }
+  return viewers[0];
 }
 
-let animationRunning = false;
-let finalViewer = null;
+/* ANIMATION */
+let running=false;
+let final=null;
 
 function roll(){
+  if(running) return;
+  running=true;
 
-if(animationRunning) return;
+  rolls++;
+  document.getElementById("rolls").innerText=rolls;
 
-animationRunning = true;
+  let t=0;
+  let cycles=30;
 
-rollCount++;
-document.getElementById("rolls").textContent = rollCount;
+  let anim=setInterval(()=>{
 
-let cycles = 25;
+    let v=viewers[Math.floor(Math.random()*viewers.length)];
+    show(v);
 
-const interval = setInterval(()=>{
+    cycles--;
+    t+=1;
 
-const randomViewer =
-viewers[Math.floor(Math.random()*viewers.length)];
+    if(cycles<=0){
+      clearInterval(anim);
+      final=pick();
+      show(final);
+      finish(final);
+      running=false;
+    }
 
-showViewer(randomViewer);
-
-cycles--;
-
-if(cycles <= 0){
-
-clearInterval(interval);
-
-finalViewer = pickViewer();
-
-showViewer(finalViewer);
-
-finishRoll(finalViewer);
-
-animationRunning = false;
-
+  },70);
 }
 
-},80);
-
+function skip(){
+  if(!running) return;
+  running=false;
+  final=pick();
+  show(final);
+  finish(final);
 }
 
-function skipAnimation(){
+function show(v){
+  document.getElementById("img").src=v.image;
+  document.getElementById("name").innerText=v.name;
+  document.getElementById("odds").innerText="1 in "+v.odds;
 
-if(!animationRunning) return;
-
-animationRunning = false;
-
-finalViewer = pickViewer();
-
-showViewer(finalViewer);
-
-finishRoll(finalViewer);
-
+  let box=document.getElementById("display");
+  box.className=rarity(v.odds);
 }
 
-function showViewer(viewer){
+/* SAVE RESULTS */
+function finish(v){
 
-const display = document.getElementById("rollDisplay");
+inventory[v.name]=(inventory[v.name]||0)+1;
 
-display.className = rarityClass(viewer.odds);
+if(!discovered.includes(v.name))
+discovered.push(v.name);
 
-document.getElementById("viewerImage").src =
-viewer.image;
-
-document.getElementById("viewerName").textContent =
-viewer.name;
-
-document.getElementById("viewerOdds").textContent =
-`1 in ${viewer.odds}`;
-
-}
-
-function finishRoll(viewer){
-
-inventory[viewer.name] =
-(inventory[viewer.name] || 0)+1;
-
-if(!discovered.includes(viewer.name))
-discovered.push(viewer.name);
-
-if(viewer.odds > bestOdds){
-
-bestOdds = viewer.odds;
-
-document.getElementById("bestRoll").textContent =
-`${viewer.name} (1/${viewer.odds})`;
-
+if(v.odds>best){
+best=v.odds;
+document.getElementById("best").innerText=v.name+" (1/"+v.odds+")";
 }
 
 save();
-renderInventory();
-renderCollection();
-
+render();
 }
 
-function renderInventory(){
+/* INVENTORY */
+function render(){
+let inv=document.getElementById("inv");
+inv.innerHTML="";
 
-const div = document.getElementById("inventory");
+for(let name in inventory){
+let v=viewers.find(x=>x.name===name);
 
-div.innerHTML = "";
-
-Object.entries(inventory).forEach(([name,count])=>{
-
-const viewer =
-viewers.find(v=>v.name===name);
-
-div.innerHTML += `
-<div class="card ${rarityClass(viewer.odds)}">
-<img src="${viewer.image}">
-<h3>${viewer.name}</h3>
-<div>1 in ${viewer.odds}</div>
-<div>x${count}</div>
-</div>
-`;
-
-});
-
+inv.innerHTML+=`
+<div class="card ${rarity(v.odds)}">
+<img src="${v.image}">
+<div>${v.name}</div>
+<div>1 in ${v.odds}</div>
+<div>x${inventory[name]}</div>
+</div>`;
 }
 
-function renderCollection(){
-
-const div =
-document.getElementById("collection");
-
-div.innerHTML = "";
+/* COLLECTION */
+let col=document.getElementById("col");
+col.innerHTML="";
 
 viewers.forEach(v=>{
-
-const found =
-discovered.includes(v.name);
-
-div.innerHTML += `
-<div class="collection-item ${found ? "discovered":"undiscovered"}">
-${found ? "✓":"?"}
-${v.name}
-(1/${v.odds})
-</div>
-`;
-
+col.innerHTML+=`
+<div class="${discovered.includes(v.name)?"discovered":"undiscovered"}">
+${discovered.includes(v.name)?"✓":"?"} ${v.name} (1/${v.odds})
+</div>`;
 });
 
 }
 
 function save(){
-
-localStorage.setItem(
-"inventory",
-JSON.stringify(inventory)
-);
-
-localStorage.setItem(
-"discovered",
-JSON.stringify(discovered)
-);
-
-localStorage.setItem(
-"rollCount",
-rollCount
-);
-
-localStorage.setItem(
-"bestOdds",
-bestOdds
-);
-
+localStorage.setItem("inv",JSON.stringify(inventory));
+localStorage.setItem("col",JSON.stringify(discovered));
+localStorage.setItem("rolls",rolls);
+localStorage.setItem("best",best);
 }
 
-if(bestOdds > 0){
-
-const best =
-viewers.find(v=>v.odds === bestOdds);
-
-if(best){
-
-document.getElementById("bestRoll").textContent =
-`${best.name} (1/${best.odds})`;
-
-}
-
-}
-
-renderInventory();
-renderCollection();
+render();
 
 </script>
 
