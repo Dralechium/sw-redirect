@@ -11,10 +11,8 @@ body{
   background:#0b0b0b;
   color:white;
 }
-.header h1{
-  color:#42ff29;
-  text-shadow:0 0 10px #42ff29;
-}
+
+/* HEADER + HUD */
 .header{
   text-align:center;
   padding:15px;
@@ -22,12 +20,36 @@ body{
   border-bottom:2px solid #222;
 }
 
-.stats{
-  display:flex;
-  justify-content:center;
-  gap:40px;
+.header h1{
+  color:#42ff29;
+  text-shadow:0 0 10px #42ff29;
+  margin:0;
 }
 
+.hud{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 20px;
+}
+
+.hudBox{
+  padding:12px 18px;
+  border-radius:12px;
+  background:#1a1a1a;
+  border:2px solid #42ff29;
+  font-size:16px;
+  font-weight:bold;
+  box-shadow:0 0 10px rgba(66,255,41,0.3);
+  user-select:none;
+  pointer-events:none;
+}
+
+#rollBox{
+  color:#42ff29;
+}
+
+/* CENTER AREA */
 .roll-area{
   text-align:center;
   padding:30px;
@@ -94,57 +116,18 @@ body{
 }
 
 /* rarity glow + color themes */
-/* INVENTORY CARD RARITIES */
-.card.common{
-  box-shadow:0 0 8px gray;
-  background:linear-gradient(145deg,#1a1a1a,#2a2a2a);
-}
-
-.card.rare{
-  box-shadow:0 0 12px #4da6ff;
-  background:linear-gradient(145deg,#0b1a2a,#123a66);
-}
-
-.card.epic{
-  box-shadow:0 0 18px #b84dff;
-  background:linear-gradient(145deg,#1a0b2a,#3a1266);
-}
-
-.card.legendary{
-  box-shadow:0 0 25px gold;
-  background:linear-gradient(145deg,#2a220b,#665012);
-}
-
-.card.mythic{
-  box-shadow:0 0 35px red;
-  background:linear-gradient(145deg,#2a0b0b,#661212);
-}
+.card.common{ box-shadow:0 0 8px gray; background:linear-gradient(145deg,#1a1a1a,#2a2a2a); }
+.card.rare{ box-shadow:0 0 12px #4da6ff; background:linear-gradient(145deg,#0b1a2a,#123a66); }
+.card.epic{ box-shadow:0 0 18px #b84dff; background:linear-gradient(145deg,#1a0b2a,#3a1266); }
+.card.legendary{ box-shadow:0 0 25px gold; background:linear-gradient(145deg,#2a220b,#665012); }
+.card.mythic{ box-shadow:0 0 35px red; background:linear-gradient(145deg,#2a0b0b,#661212); }
 
 /* PREVIEW SCREEN RARITIES */
-#display.common{
-  background:linear-gradient(145deg,#1a1a1a,#2a2a2a);
-  box-shadow:0 0 15px gray;
-}
-
-#display.rare{
-  background:linear-gradient(145deg,#0b1a2a,#123a66);
-  box-shadow:0 0 20px #4da6ff;
-}
-
-#display.epic{
-  background:linear-gradient(145deg,#1a0b2a,#3a1266);
-  box-shadow:0 0 25px #b84dff;
-}
-
-#display.legendary{
-  background:linear-gradient(145deg,#2a220b,#665012);
-  box-shadow:0 0 30px gold;
-}
-
-#display.mythic{
-  background:linear-gradient(145deg,#2a0b0b,#661212);
-  box-shadow:0 0 40px red;
-}
+#display.common{ box-shadow:0 0 15px gray; }
+#display.rare{ box-shadow:0 0 20px #4da6ff; }
+#display.epic{ box-shadow:0 0 25px #b84dff; }
+#display.legendary{ box-shadow:0 0 30px gold; }
+#display.mythic{ box-shadow:0 0 40px red; }
 
 /* locked */
 .locked img{
@@ -169,15 +152,26 @@ body{
 
 <body>
 
+<!-- HEADER -->
 <div class="header">
-  <h1>theos RNG</h1>
 
-  <div class="stats">
-    <div>Rolls: <span id="rolls">0</span></div>
-    <div>Best: <span id="best">None</span></div>
+  <div class="hud">
+
+    <div class="hudBox" id="rollBox">
+      Rolls: <span id="rolls">0</span>
+    </div>
+
+    <h1>theos RNG</h1>
+
+    <div class="hudBox" id="bestBox">
+      Best: <span id="best">None</span>
+    </div>
+
   </div>
+
 </div>
 
+<!-- GAME -->
 <div class="roll-area">
 
   <div id="display">
@@ -190,6 +184,7 @@ body{
 
 </div>
 
+<!-- INVENTORY -->
 <div id="inventory" class="grid"></div>
 
 <script>
@@ -208,7 +203,9 @@ const viewers = [
   {name:"Christ_Is_God", odds:5000, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/98b31c09-fa8b-4318-88bd-ef8a0443b772-profile_image-70x70.png"},
   {name:"theosGMD", odds:10000, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/0ffc8233-6b32-411e-bfbd-4167c09cc2a2-profile_image-70x70.png"}
 ];
+
 const defaultViewer = viewers[viewers.length - 1];
+
 /* DATA */
 let inventory = JSON.parse(localStorage.getItem("inv")||"{}");
 let rolls = Number(localStorage.getItem("rolls")||0);
@@ -219,6 +216,7 @@ if(best){
   document.getElementById("best").innerText =
     `${best.name} (1/${best.odds})`;
 }
+
 /* RARITY */
 function rarity(o){
   if(o<=5) return "common";
@@ -229,19 +227,8 @@ function rarity(o){
 }
 
 /* RNG */
-function pick(p){
-  const sorted=[...viewers].sort((a,b)=>b.odds-a.odds);
-
-  let dropZone = p > 0.7 && p < 0.9;
-
-  for(let v of sorted){
-    if(dropZone && v.odds >= 100){
-      if(Math.random() < 1/(v.odds/2)) return v;
-    }
-    if(Math.floor(Math.random()*v.odds)===0) return v;
-  }
-
-  return viewers[0];
+function pick(){
+  return viewers[Math.floor(Math.random()*viewers.length)];
 }
 
 /* ROLL */
@@ -261,19 +248,14 @@ function roll(){
     let p = (t - start) / rollDuration;
     if(p > 1) p = 1;
 
-    let curve = 1 - Math.pow(1 - p, 4);
-    let delay = 35 + (220 * curve);
+    let delay = 35 + (220 * p);
 
     if(p < 1){
-
-      let v = viewers[Math.floor(Math.random()*viewers.length)];
+      let v = pick();
       show(v);
-
       setTimeout(()=>requestAnimationFrame(frame), delay);
-
     } else {
-
-      let final = pick(p);
+      let final = pick();
       show(final);
       finish(final);
       running = false;
@@ -283,7 +265,7 @@ function roll(){
   requestAnimationFrame(frame);
 }
 
-/* 🔥 FIX: RARITY SYNCED DISPLAY UPDATE */
+/* SHOW */
 function show(v){
   const display = document.getElementById("display");
 
@@ -291,19 +273,16 @@ function show(v){
   document.getElementById("name").innerText = v.name;
   document.getElementById("odds").innerText = "1 in " + v.odds;
 
-  display.className = "";
-  display.classList.add(rarity(v.odds));
+  display.className = rarity(v.odds);
 }
+
 /* FINISH */
 function finish(v){
 
   inventory[v.name] = (inventory[v.name] || 0) + 1;
 
   if(!best || v.odds > best.odds){
-    best = {
-      name: v.name,
-      odds: v.odds
-    };
+    best = { name:v.name, odds:v.odds };
 
     document.getElementById("best").innerText =
       `${best.name} (1/${best.odds})`;
@@ -338,11 +317,9 @@ function save(){
   localStorage.setItem("rolls", rolls);
   localStorage.setItem("best", JSON.stringify(best));
 }
+
+/* START */
 show(defaultViewer);
-document.getElementById("odds").innerText = "1 in " + defaultViewer.odds;
-document.getElementById("name").innerText = defaultViewer.name;
-document.getElementById("img").src = defaultViewer.image;
-document.getElementById("display").className = rarity(defaultViewer.odds);
 render();
 
 </script>
