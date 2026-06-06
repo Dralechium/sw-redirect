@@ -201,7 +201,7 @@ body{
     <h1>theos RNG</h1>
 
     <div class="hudBox" id="bestBox">
-      Best: <span id="bestLabel">None</span> <span id="bestValue"></span>
+      Best: <span id="best">None</span>
     </div>
 
   </div>
@@ -255,12 +255,12 @@ if(best){
 }
 
 /* RARITY */
-function rarityColor(o){
-  if(o<=5) return "#9e9e9e";      // common
-  if(o<=25) return "#4da6ff";     // rare
-  if(o<=100) return "#b84dff";    // epic
-  if(o<=1000) return "gold";      // legendary
-  return "#ff3b3b";              // mythic
+function rarity(o){
+  if(o<=5) return "common";
+  if(o<=25) return "rare";
+  if(o<=100) return "epic";
+  if(o<=1000) return "legendary";
+  return "mythic";
 }
 
 /* RNG */
@@ -358,11 +358,9 @@ function finish(v){
 
   if(!best || v.odds > best.odds){
     best = { name:v.name, odds:v.odds };
-document.getElementById("bestLabel").innerText = "Best:";
-    const bestValue = document.getElementById("bestValue");
 
-bestValue.innerText = `${best.name} (1/${best.odds})`;
-bestValue.style.color = rarityColor(best.odds);
+    document.getElementById("best").innerText =
+      `${best.name} (1/${best.odds})`;
   }
 
   save();
