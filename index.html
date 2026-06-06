@@ -139,6 +139,9 @@ body{
 
 <script>
 
+/* 🎛️ MANUAL CONTROL (YOU CHANGE THIS) */
+let rollDuration = 3000;
+
 /* VIEWERS */
 const viewers = [
   {name:"duckwithsunnies", odds:2, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/6ef3b0ef-bc0b-463d-a3d9-1f2a646a534f-profile_image-70x70.png"},
@@ -161,21 +164,27 @@ let best = Number(localStorage.getItem("best")||0);
 
 document.getElementById("rolls").innerText = rolls;
 
-/* 🎵 AUDIO (FIXED DISCORD VERSION) */
-let rollSound = new Audio();
-rollSound.src = "https://cdn.discordapp.com/attachments/836828986180239371/1512824863386243143/Lucky_wheel_spin_sound_effect.mp3";
+/* 🔊 SOUND SYSTEM (FIXED) */
+let rollSound = new Audio(
+  "https://cdn.discordapp.com/attachments/836828986180239371/1512824863386243143/Lucky_wheel_spin_sound_effect.mp3"
+);
+
 rollSound.preload = "auto";
-rollSound.load();
+rollSound.volume = 1;
 
-let tickSound = new Audio("https://cdn.discordapp.com/attachments/836828986180239371/1512824863386243143/Lucky_wheel_spin_sound_effect.mp3");
+/* unlock audio on first interaction (browser fix) */
+document.addEventListener("click", () => {
+  rollSound.play().then(()=>rollSound.pause()).catch(()=>{});
+}, { once:true });
 
-let rollDuration = 3000;
+function playSound(){
+  rollSound.pause();
+  rollSound.currentTime = 0;
 
-rollSound.addEventListener("canplaythrough", () => {
-  if (!isNaN(rollSound.duration) && rollSound.duration > 0) {
-    rollDuration = rollSound.duration * 1000;
-  }
-});
+  rollSound.play().catch(err=>{
+    console.log("Audio blocked until interaction:", err);
+  });
+}
 
 /* RARITY */
 function rarity(o){
@@ -186,7 +195,7 @@ function rarity(o){
   return "mythic";
 }
 
-/* RNG + DROP ZONE BOOST */
+/* RNG */
 function pick(p){
   const sorted=[...viewers].sort((a,b)=>b.odds-a.odds);
 
@@ -204,52 +213,48 @@ function pick(p){
   return viewers[0];
 }
 
-/* ROLL SYSTEM */
+/* ROLL */
 let running=false;
 
 function roll(){
   if(running) return;
   running=true;
 
-  /* SOUND START */
-  rollSound.pause();
-  rollSound.currentTime=0;
-  rollSound.play().catch(()=>{});
+  playSound();
 
   rolls++;
   document.getElementById("rolls").innerText = rolls;
 
-  const start=performance.now();
+  const start = performance.now();
 
   function frame(t){
-    let p=(t-start)/rollDuration;
-    if(p>1) p=1;
+    let p = (t - start) / rollDuration;
+    if(p > 1) p = 1;
 
     let curve = 1 - Math.pow(1 - p, 4);
     let delay = 35 + (220 * curve);
 
-    /* tick sound slows with roll */
-    if(Math.random()<0.6){
-      tickSound.currentTime=0;
-      tickSound.play().catch(()=>{});
+    if(Math.random() < 0.6){
+      rollSound.currentTime = 0;
+      rollSound.play().catch(()=>{});
     }
 
-    if(p<1){
+    if(p < 1){
 
       let v = viewers[Math.floor(Math.random()*viewers.length)];
       show(v);
 
-      setTimeout(()=>requestAnimationFrame(frame),delay);
+      setTimeout(()=>requestAnimationFrame(frame), delay);
 
     } else {
 
       let final = pick(p);
       show(final);
       finish(final);
-      running=false;
+      running = false;
 
       rollSound.pause();
-      rollSound.currentTime=0;
+      rollSound.currentTime = 0;
     }
   }
 
@@ -258,53 +263,50 @@ function roll(){
 
 /* SHOW */
 function show(v){
-  document.getElementById("img").src=v.image;
-  document.getElementById("name").innerText=v.name;
-  document.getElementById("odds").innerText="1 in "+v.odds;
-  document.getElementById("display").className=rarity(v.odds);
+  document.getElementById("img").src = v.image;
+  document.getElementById("name").innerText = v.name;
+  document.getElementById("odds").innerText = "1 in " + v.odds;
+  document.getElementById("display").className = rarity(v.odds);
 }
 
 /* FINISH */
 function finish(v){
+  inventory[v.name] = (inventory[v.name] || 0) + 1;
 
-inventory[v.name]=(inventory[v.name]||0)+1;
+  if(v.odds > best){
+    best = v.odds;
+    document.getElementById("best").innerText =
+      v.name + " (1/" + v.odds + ")";
+  }
 
-if(v.odds > best){
-  best = v.odds;
-  document.getElementById("best").innerText =
-    v.name + " (1/" + v.odds + ")";
-}
-
-save();
-render();
+  save();
+  render();
 }
 
 /* INVENTORY */
 function render(){
+  let inv = document.getElementById("inventory");
+  inv.innerHTML = "";
 
-let inv=document.getElementById("inventory");
-inv.innerHTML="";
+  for(let v of viewers){
+    let owned = inventory[v.name];
 
-for(let v of viewers){
-
-let owned = inventory[v.name];
-
-inv.innerHTML+=`
-<div class="card ${owned ? rarity(v.odds) : "locked"}">
-  <img src="${owned ? v.image : "https://i.imgur.com/8QfQ3vR.png"}">
-  ${!owned ? '<div class="lockIcon">🔒</div>' : ""}
-  <div>${owned ? v.name : "???"}</div>
-  <div>${owned ? "1 in "+v.odds : "Locked"}</div>
-  <div>${owned ? "x"+owned : ""}</div>
-</div>`;
-}
-
+    inv.innerHTML += `
+      <div class="card ${owned ? rarity(v.odds) : "locked"}">
+        <img src="${owned ? v.image : "https://i.imgur.com/8QfQ3vR.png"}">
+        ${!owned ? '<div class="lockIcon">🔒</div>' : ""}
+        <div>${owned ? v.name : "???"}</div>
+        <div>${owned ? "1 in "+v.odds : "Locked"}</div>
+        <div>${owned ? "x"+owned : ""}</div>
+      </div>
+    `;
+  }
 }
 
 function save(){
-localStorage.setItem("inv",JSON.stringify(inventory));
-localStorage.setItem("rolls",rolls);
-localStorage.setItem("best",best);
+  localStorage.setItem("inv", JSON.stringify(inventory));
+  localStorage.setItem("rolls", rolls);
+  localStorage.setItem("best", best);
 }
 
 render();
