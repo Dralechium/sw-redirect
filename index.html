@@ -255,13 +255,33 @@ let running=false;
 
 function roll(){
   if(running) return;
-  running=true;
+  running = true;
 
   rolls++;
   document.getElementById("rolls").innerText = rolls;
 
   const start = performance.now();
   const rollDuration = 3000;
+
+  function visualPick(){
+    return viewers[Math.floor(Math.random() * viewers.length)];
+  }
+
+  function weightedPick(){
+    let total = 0;
+
+    for (let v of viewers) {
+      total += 1 / v.odds;
+    }
+
+    let r = Math.random() * total;
+
+    let acc = 0;
+    for (let v of viewers) {
+      acc += 1 / v.odds;
+      if (r <= acc) return v;
+    }
+  }
 
   function frame(t){
     let p = (t - start) / rollDuration;
@@ -270,11 +290,13 @@ function roll(){
     let delay = 35 + (220 * p);
 
     if(p < 1){
-      let v = pick();
+      let v = visualPick();
       show(v);
-      setTimeout(()=>requestAnimationFrame(frame), delay);
+
+      setTimeout(() => requestAnimationFrame(frame), delay);
+
     } else {
-      let final = pick();
+      let final = weightedPick();
       show(final);
       finish(final);
       running = false;
