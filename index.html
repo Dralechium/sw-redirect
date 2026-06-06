@@ -139,20 +139,19 @@ body{
 
 <script>
 
-/* 🎛️ MANUAL SETTINGS */
-let rollDuration = 3000; // change spin speed here
+/* 🎛️ SETTINGS */
+let rollDuration = 3000;
 
-/* 🎵 BEST AUDIO SYSTEM (DISCORD MP3) */
+/* 🔊 AUDIO SYSTEM (FIXED + WORKING) */
 const AUDIO_URL =
-"https://cdn.discordapp.com/attachments/836828986180239371/1512824863386243143/Lucky_wheel_spin_sound_effect.mp3";
+"https://raw.githubusercontent.com/Dralechium/sw-redirect/dd60b3328976997e8446f04b831aa79e34be38e4/Lucky%20wheel%20spin%20sound%20effect.mp3";
 
-/* single persistent audio instance (IMPORTANT) */
 const rollAudio = new Audio(AUDIO_URL);
 rollAudio.preload = "auto";
 rollAudio.volume = 1;
 rollAudio.loop = false;
 
-/* unlock audio after first interaction (browser rule) */
+/* unlock audio after first click */
 document.addEventListener("click", () => {
   rollAudio.play().then(() => {
     rollAudio.pause();
@@ -167,12 +166,10 @@ function playRollSound(){
 
     const p = rollAudio.play();
     if(p !== undefined){
-      p.catch(err => {
-        console.log("Audio blocked or failed:", err);
-      });
+      p.catch(err => console.log("Audio error:", err));
     }
   } catch(e){
-    console.log("Audio error:", e);
+    console.log("Audio exception:", e);
   }
 }
 
@@ -214,11 +211,9 @@ function pick(p){
   let dropZone = p > 0.7 && p < 0.9;
 
   for(let v of sorted){
-
     if(dropZone && v.odds >= 100){
       if(Math.random() < 1/(v.odds/2)) return v;
     }
-
     if(Math.floor(Math.random()*v.odds)===0) return v;
   }
 
@@ -232,8 +227,7 @@ function roll(){
   if(running) return;
   running=true;
 
-  /* 🔊 PLAY SOUND */
-  playRollSound();
+  playRollSound(); // 🔊 SOUND TRIGGER
 
   rolls++;
   document.getElementById("rolls").innerText = rolls;
@@ -248,14 +242,10 @@ function roll(){
     let delay = 35 + (220 * curve);
 
     if(p < 1){
-
       let v = viewers[Math.floor(Math.random()*viewers.length)];
       show(v);
-
       setTimeout(()=>requestAnimationFrame(frame), delay);
-
     } else {
-
       let final = pick(p);
       show(final);
       finish(final);
