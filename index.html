@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Viewer RNG</title>
+<title>theos RNG</title>
 
 <style>
 body{
@@ -12,7 +12,6 @@ body{
   color:white;
 }
 
-/* HEADER */
 .header{
   text-align:center;
   padding:15px;
@@ -59,17 +58,21 @@ body{
   color:#aaa;
 }
 
-button{
-  padding:12px 20px;
-  margin:5px;
+/* BIGGER ROLL BUTTON UNDER DISPLAY */
+.rollBtn{
+  padding:18px 60px;
+  font-size:20px;
   border:none;
-  border-radius:10px;
+  border-radius:12px;
   cursor:pointer;
-  font-size:16px;
+  background:#5865F2;
+  color:white;
+  margin-top:10px;
 }
 
-.rollBtn{ background:#5865F2; color:white; }
-.skipBtn{ background:#333; color:white; }
+button:hover{
+  opacity:0.9;
+}
 
 /* PANELS */
 .panels{
@@ -85,7 +88,6 @@ button{
   padding:15px;
 }
 
-/* INVENTORY GRID */
 .grid{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
@@ -134,14 +136,13 @@ button{
 
 <div class="roll-area">
 
-  <button class="rollBtn" onclick="roll()">ROLL</button>
-  <button class="skipBtn" onclick="skip()">SKIP</button>
-
   <div id="display">
     <img id="img" src="https://i.pravatar.cc/150">
     <div id="name">Press Roll</div>
     <div id="odds"></div>
   </div>
+
+  <button class="rollBtn" onclick="roll()">ROLL</button>
 
 </div>
 
@@ -161,7 +162,7 @@ button{
 
 <script>
 
-/* YOUR VIEWERS */
+/* VIEWERS */
 const viewers = [
   {name:"duckwithsunnies", odds:2, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/6ef3b0ef-bc0b-463d-a3d9-1f2a646a534f-profile_image-70x70.png"},
   {name:"ilee_ez", odds:4, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/e0efcfce-7516-4589-9bcf-5c6ec63a8a76-profile_image-70x70.png"},
@@ -183,7 +184,7 @@ let best = Number(localStorage.getItem("best")||0);
 
 document.getElementById("rolls").innerText = rolls;
 
-/* RARITY CLASS */
+/* RARITY */
 function rarity(o){
   if(o<=5) return "common";
   if(o<=25) return "rare";
@@ -192,18 +193,17 @@ function rarity(o){
   return "mythic";
 }
 
-/* TRUE RNG SYSTEM */
+/* TRUE RNG */
 function pick(){
-  const sorted = [...viewers].sort((a,b)=>b.odds-a.odds);
+  const sorted=[...viewers].sort((a,b)=>b.odds-a.odds);
   for(let v of sorted){
     if(Math.floor(Math.random()*v.odds)===0) return v;
   }
   return viewers[0];
 }
 
-/* ANIMATION */
+/* FAST → SLOW ANIMATION */
 let running=false;
-let final=null;
 
 function roll(){
   if(running) return;
@@ -212,46 +212,45 @@ function roll(){
   rolls++;
   document.getElementById("rolls").innerText=rolls;
 
-  let t=0;
-  let cycles=30;
+  let duration = 2500;
+  let start = performance.now();
 
-  let anim=setInterval(()=>{
+  function frame(time){
+    let progress = (time-start)/duration;
 
-    let v=viewers[Math.floor(Math.random()*viewers.length)];
-    show(v);
+    // ease-out (slow at end)
+    let speed = Math.max(50, 200 * (1 - progress));
 
-    cycles--;
-    t+=1;
+    if(progress < 1){
 
-    if(cycles<=0){
-      clearInterval(anim);
-      final=pick();
+      let v = viewers[Math.floor(Math.random()*viewers.length)];
+      show(v);
+
+      setTimeout(()=>requestAnimationFrame(frame), speed);
+
+    } else {
+
+      let final = pick();
       show(final);
       finish(final);
       running=false;
+
     }
+  }
 
-  },70);
+  requestAnimationFrame(frame);
 }
 
-function skip(){
-  if(!running) return;
-  running=false;
-  final=pick();
-  show(final);
-  finish(final);
-}
-
+/* SHOW */
 function show(v){
   document.getElementById("img").src=v.image;
   document.getElementById("name").innerText=v.name;
   document.getElementById("odds").innerText="1 in "+v.odds;
 
-  let box=document.getElementById("display");
-  box.className=rarity(v.odds);
+  document.getElementById("display").className=rarity(v.odds);
 }
 
-/* SAVE RESULTS */
+/* FINISH */
 function finish(v){
 
 inventory[v.name]=(inventory[v.name]||0)+1;
@@ -268,12 +267,21 @@ save();
 render();
 }
 
-/* INVENTORY */
+/* INVENTORY SORTED LOW → HIGH RARITY */
 function render(){
+
 let inv=document.getElementById("inv");
 inv.innerHTML="";
 
-for(let name in inventory){
+let entries = Object.entries(inventory)
+.sort((a,b)=>{
+let va=viewers.find(v=>v.name===a[0]).odds;
+let vb=viewers.find(v=>v.name===b[0]).odds;
+return va - vb;
+});
+
+for(let [name,count] of entries){
+
 let v=viewers.find(x=>x.name===name);
 
 inv.innerHTML+=`
@@ -281,11 +289,10 @@ inv.innerHTML+=`
 <img src="${v.image}">
 <div>${v.name}</div>
 <div>1 in ${v.odds}</div>
-<div>x${inventory[name]}</div>
+<div>x${count}</div>
 </div>`;
 }
 
-/* COLLECTION */
 let col=document.getElementById("col");
 col.innerHTML="";
 
