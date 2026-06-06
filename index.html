@@ -30,13 +30,14 @@ body{
   padding:30px;
 }
 
+/* 🎴 ROLL DISPLAY CARD */
 #display{
   width:360px;
   margin:20px auto;
   padding:20px;
   border-radius:15px;
   background:#181818;
-  transition:0.3s;
+  transition:0.25s ease;
 }
 
 #display img{
@@ -89,12 +90,31 @@ body{
   border-radius:50%;
 }
 
-/* rarity glow */
-.common{ box-shadow:0 0 8px gray; background: linear-gradient(145deg, #1a1a1a, #2a2a2a); }
-.rare{ box-shadow:0 0 12px #4da6ff; background: linear-gradient(145deg, #0b1a2a, #123a66); }
-.epic{ box-shadow:0 0 18px #b84dff; background: linear-gradient(145deg, #1a0b2a, #3a1266); }
-.legendary{ box-shadow:0 0 25px gold; background: linear-gradient(145deg, #2a220b, #665012); }
-.mythic{ box-shadow:0 0 35px red; background: linear-gradient(145deg, #2a0b0b, #661212); }
+/* rarity glow + colors */
+.common{
+  box-shadow:0 0 8px gray;
+  background: linear-gradient(145deg, #1a1a1a, #2a2a2a);
+}
+
+.rare{
+  box-shadow:0 0 12px #4da6ff;
+  background: linear-gradient(145deg, #0b1a2a, #123a66);
+}
+
+.epic{
+  box-shadow:0 0 18px #b84dff;
+  background: linear-gradient(145deg, #1a0b2a, #3a1266);
+}
+
+.legendary{
+  box-shadow:0 0 25px gold;
+  background: linear-gradient(145deg, #2a220b, #665012);
+}
+
+.mythic{
+  box-shadow:0 0 35px red;
+  background: linear-gradient(145deg, #2a0b0b, #661212);
+}
 
 /* locked */
 .locked img{
@@ -110,7 +130,6 @@ body{
   font-size:26px;
 }
 
-/* optional polish */
 .card:hover{
   transform: scale(1.03);
 }
@@ -183,11 +202,9 @@ function pick(p){
   let dropZone = p > 0.7 && p < 0.9;
 
   for(let v of sorted){
-
     if(dropZone && v.odds >= 100){
       if(Math.random() < 1/(v.odds/2)) return v;
     }
-
     if(Math.floor(Math.random()*v.odds)===0) return v;
   }
 
@@ -196,6 +213,16 @@ function pick(p){
 
 /* ROLL */
 let running=false;
+
+function applyDisplayRarity(v){
+  const display = document.getElementById("display");
+
+  // reset first (important to prevent class stacking bugs)
+  display.className = "";
+
+  // apply rarity class
+  display.classList.add(rarity(v.odds));
+}
 
 function roll(){
   if(running) return;
@@ -238,7 +265,8 @@ function show(v){
   document.getElementById("img").src = v.image;
   document.getElementById("name").innerText = v.name;
   document.getElementById("odds").innerText = "1 in " + v.odds;
-  document.getElementById("display").className = rarity(v.odds);
+
+  applyDisplayRarity(v); // 🎯 THIS IS THE FIX
 }
 
 /* FINISH */
