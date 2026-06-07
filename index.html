@@ -795,83 +795,86 @@ window.playCutscene = function(type){
 
   display.style.opacity = 0;
 
-  function frame(now){
-    const t = now - start;
+ function frame(now) {
+  const t = now - start;
 
-    /* 1. fade to black */
-    if(t < FADE_TO_BLACK){
-      overlay.style.opacity = t / FADE_TO_BLACK;
+  /* 1. fade to black */
+  if (t < FADE_TO_BLACK) {
+    overlay.style.opacity = t / FADE_TO_BLACK;
+  }
+
+  /* 2. hold black */
+  else if (t < RED_START) {
+    overlay.style.opacity = 1;
+  }
+
+  /* 3. red fade in (SMOOTH, not instant) */
+  else if (t < RED_START + 400) {
+    overlay.style.opacity = 1;
+
+    const p = (t - RED_START) / 400;
+
+    red.style.opacity = p;
+    red.style.transform = `scale(${0.2 + p * 0.4})`;
+  }
+
+  /* 4. exponential expansion (NO SHAPE SWITCH) */
+  else if (t < RED_START + RED_DURATION) {
+    const p = (t - (RED_START + 400)) / (RED_DURATION - 400);
+
+    const e = easeInExpo(p);
+
+    red.style.opacity = 1;
+
+    // keep uniform scaling base, then breathing stretch
+    const base = 0.6 + e * 8;
+
+    // subtle distortion only
+    const stretch = 1 + (Math.sin(e * Math.PI) * 0.15);
+
+    red.style.transform = `scale(${base * stretch})`;
+  }
+
+  /* 5. full screen burst */
+  else if (t < RED_START + RED_DURATION + 200) {
+    red.style.opacity = 1;
+    red.style.transform = "scale(25, 15)";
+  }
+
+  /* 6. fade out + reveal instantly */
+  else {
+    red.style.opacity = 0;
+    overlay.style.opacity = 0;
+
+    display.classList.remove("revealAnimation");
+    void display.offsetWidth;
+    display.classList.add("revealAnimation");
+
+    display.style.opacity = 1;
+
+    if (type === "legendary") {
+      spawnSparkles("#ffd700");
     }
 
-    /* 2. hold black */
-    else if(t < RED_START){
-      overlay.style.opacity = 1;
+    if (type === "mythic") {
+      spawnSparkles("#ff3030");
     }
 
-    /* 3. red fade in (SMOOTH, not instant) */
-    else if(t < RED_START + 400){
-      overlay.style.opacity = 1;
-
-      const p = (t - RED_START) / 400;
-
-      red.style.opacity = p;
-      red.style.transform = `scale(${0.2 + p * 0.4})`;
-    }
-
-    /* 4. exponential expansion (NO SHAPE SWITCH) */
-    else if(t < RED_START + RED_DURATION){
-      const p = (t - (RED_START + 400)) / (RED_DURATION - 400);
-
-      const e = easeInExpo(p);
-
-      red.style.opacity = 1;
-
-      // keep uniform scaling base, then breathing stretch
-      const base = 0.6 + e * 8;
-
-      // subtle distortion only
-      const stretch = 1 + (Math.sin(e * Math.PI) * 0.15);
-
-      red.style.transform = `scale(${base * stretch})`;
-    }
-
-    /* 5. full screen burst */
-    else if(t < RED_START + RED_DURATION + 200){
-      red.style.opacity = 1;
-      red.style.transform = "scale(25, 15)";
-    }
-
-    /* 6. fade out + reveal instantly */
-    else{
-      red.style.opacity = 0;
-      overlay.style.opacity = 0;
-      display.classList.remove("revealAnimation");
-      void display.offsetWidth;
-      display.classList.add("revealAnimation");
-      display.style.opacity = 1;
-      return;
-    }
-
-    requestAnimationFrame(frame);
+    return;
   }
 
   requestAnimationFrame(frame);
-};
-
-if(type === "legendary"){
-  spawnSparkles("#ffd700");
 }
 
-if(type === "mythic"){
-  spawnSparkles("#ff3030");
-}
+requestAnimationFrame(frame);
 
-transform: perspective(1000px) rotateY(...)
+</script>
+
+<div id="cutsceneOverlay">
+  <div id="redLight"></div>
+</div>
 
 <div id="sparkles"></div>
-</script>
-<div id="cutsceneOverlay"></div>
-<div id="redLight"></div>
-</div>
+
 </body>
 </html>
