@@ -467,6 +467,7 @@ html, body {
 <div id="inventoryPage" class="page">
   <div id="inventory" class="grid"></div>
 </div>
+<div id="sparkles"></div>
 <script>
   function showPage(page, btn){
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
@@ -476,6 +477,25 @@ html, body {
   } else {
     document.getElementById("inventoryPage").classList.add("active");
   }
+
+  function spawnSparkles(color){
+  const holder = document.getElementById("sparkles");
+
+  for(let i = 0; i < 25; i++){
+    const s = document.createElement("div");
+
+    s.className = "sparkle";
+    s.style.background = color;
+
+    s.style.left = (window.innerWidth/2 + (Math.random()-0.5)*300) + "px";
+    s.style.top = (window.innerHeight/2 + (Math.random()-0.5)*200) + "px";
+
+    s.style.animation = `sparkleAnim ${1 + Math.random()}s ease-out forwards`;
+
+    holder.appendChild(s);
+    setTimeout(() => s.remove(), 2000);
+  }
+}
 
   // update active button
   document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
@@ -868,9 +888,8 @@ window.playCutscene = function(type){
 
 </script>
 
-<div id="cutsceneOverlay">
-  <div id="redLight"></div>
-</div>
+<div id="cutsceneOverlay"></div>
+<div id="redLight"></div>
 
 <div id="sparkles"></div>
 
