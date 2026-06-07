@@ -23,17 +23,19 @@ body{
 
 .nav{
   position: relative;
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-
-  padding: 8px 12px;
-
   border: 2px solid #42ff29;
   border-radius: 999px;
-
   background: rgba(0,0,0,0.35);
-  overflow: hidden; /* 🔥 THIS is what stops escape */
+  display: flex;
+  justify-content: center;
+}
+
+.nav-inner{
+  position: relative;
+  display: flex;
+  gap: 20px;
+
+  padding: 8px 12px; /* moved here */
 }
 
 .nav-frame{
@@ -58,9 +60,9 @@ body{
   position: absolute;
   top: 0;
   bottom: 0;
+  left: 0;
 
   border-radius: 999px;
-
   background: #42ff29;
   opacity: 0.25;
 
@@ -287,19 +289,14 @@ body{
 </div>
 
 <!-- NAV (tabs) -->
-<div class="nav-frame">
+<div class="nav">
 
-  <div class="nav">
+  <div class="nav-inner">
 
     <div class="blob" id="blob"></div>
 
-    <button class="tab active" onclick="showPage('roll', this)">
-      Roll
-    </button>
-
-    <button class="tab" onclick="showPage('inventory', this)">
-      Inventory
-    </button>
+    <button class="tab active" onclick="showPage('roll', this)">Roll</button>
+    <button class="tab" onclick="showPage('inventory', this)">Inventory</button>
 
   </div>
 
