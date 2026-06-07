@@ -1,122 +1,35 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8">
 <title>theos RNG</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&display=swap" rel="stylesheet">
 
 <style>
 body{
   margin:0;
-  font-family: 'Orbitron', Arial, sans-serif;
+  font-family:'Orbitron', Arial, sans-serif;
   background:#0b0b0b;
   color:white;
+  overflow:hidden;
 }
 
-/* HEADER + HUD */
+/* APP WRAPPER */
+.app{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+/* HEADER */
 .header{
   text-align:center;
   padding:15px;
   background:#111;
   border-bottom:2px solid #222;
+  width:100%;
 }
-
-.nav{
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  border: 2px solid #42ff29;
-  border-radius: 999px;
-  background: rgba(0,0,0,0.35);
-
-  margin: 18px auto 22px auto; /* top | horizontal | bottom */
-
-  width: fit-content;
-  height: 56px;            /* IMPORTANT */
-  padding: 0;              /* IMPORTANT */
-
-  box-sizing: border-box;  /* IMPORTANT */
-  overflow: hidden;        /* IMPORTANT (fixes edge gap illusion) */
-}
-
-.nav-inner{
-  display: flex;
-  gap: 0;
-  height: 100%;
-}
-
-.nav-frame{
-  display:flex;
-  justify-content:center;
-  margin-top:10px;
-}
-
-.tab{
-  font-family: 'Orbitron', Arial, sans-serif;
-  height: 100%;
-  padding: 0 40px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: transparent;
-  border: none;
-  color: white;
-  z-index: 2;
-}
-
-.blob{
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-
-  background: #42ff29;
-  opacity: 0.25;
-  border-radius: 999px;
-
-  z-index: 1;
-
-  transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.page{
-  display:none;
-}
-
-.page.active{
-  display:block;
-}
-
-.header h1{
-  color:#42ff29;
-  text-shadow:0 0 10px #42ff29;
-  margin:0;
-  justify-self:center;
-}
-
-.best-common{
-  color:gray;
-}
-
-.best-rare{
-  color:#4da6ff;
-}
-
-.best-epic{
-  color:#b84dff;
-}
-
-.best-legendary{
-  color:gold;
-}
-
-.best-mythic{
-  color:#ff4d4d;
-}  
 
 .hud{
   display:grid;
@@ -133,49 +46,74 @@ body{
   font-size:16px;
   font-weight:bold;
   box-shadow:0 0 10px rgba(66,255,41,0.3);
-  user-select:none;
-  pointer-events:none;
 }
 
-#rollBox{
-  color:#42ff29;
-  justify-self:start;
+/* NAV */
+.nav{
+  position:relative;
+  display:flex;
+  justify-content:center;
+  margin:15px 0;
+  border:2px solid #42ff29;
+  border-radius:999px;
+  background:rgba(0,0,0,0.35);
+  overflow:hidden;
 }
 
-#bestBox{
-  justify-self:end;
-}
-/* CENTER AREA */
-.roll-area{
-  text-align:center;
-  padding:30px;
+.nav-inner{
+  display:flex;
+  position:relative;
 }
 
-/* ROLL DISPLAY */
+.tab{
+  font-family:'Orbitron', Arial;
+  padding:12px 50px;
+  background:transparent;
+  border:none;
+  color:white;
+  cursor:pointer;
+  z-index:2;
+}
+
+/* MOVING BLOB */
+.blob{
+  position:absolute;
+  top:0;
+  bottom:0;
+  left:0;
+  background:#42ff29;
+  opacity:0.25;
+  border-radius:999px;
+  transition:0.35s cubic-bezier(0.22,1,0.36,1);
+  z-index:1;
+}
+
+/* PAGES */
+.page{
+  display:none;
+}
+
+.page.active{
+  display:block;
+}
+
+/* DISPLAY */
 #display{
   width:360px;
   margin:20px auto;
   padding:20px;
   border-radius:15px;
   background:#181818;
-  transition:0.2s ease;
+  text-align:center;
 }
 
 #display img{
   width:120px;
   height:120px;
   border-radius:50%;
-  object-fit:cover;
 }
 
-#name{
-  font-size:28px;
-  font-weight:bold;
-  margin-top:10px;
-}
-
-#odds{ color:#aaa; }
-
+/* BUTTON */
 .rollBtn{
   padding:18px 70px;
   font-size:20px;
@@ -184,7 +122,6 @@ body{
   cursor:pointer;
   background:#5865F2;
   color:white;
-  margin-top:15px;
 }
 
 /* INVENTORY */
@@ -196,140 +133,169 @@ body{
 }
 
 .card{
-  border-radius:12px;
-  text-align:center;
-  padding:10px;
-  position:relative;
-  overflow:hidden;
-  transition:0.3s;
   background:#1a1a1a;
-
-  /* 🔥 ADD THIS */
+  border-radius:12px;
+  padding:10px;
+  text-align:center;
   min-height:170px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  gap:6px;
 }
 
-.card img{
-  width:70px;
-  height:70px;
-  border-radius:50%;
-  margin:0 auto;
-}
+/* RARITIES */
+.card.common{box-shadow:0 0 8px gray;}
+.card.rare{box-shadow:0 0 12px #4da6ff;}
+.card.epic{box-shadow:0 0 18px #b84dff;}
+.card.legendary{box-shadow:0 0 25px gold;}
+.card.mythic{box-shadow:0 0 35px red;}
 
-/* rarity glow + color themes */
-.card.common{ box-shadow:0 0 8px gray; background:linear-gradient(145deg,#1a1a1a,#2a2a2a); }
-.card.rare{ box-shadow:0 0 12px #4da6ff; background:linear-gradient(145deg,#0b1a2a,#123a66); }
-.card.epic{ box-shadow:0 0 18px #b84dff; background:linear-gradient(145deg,#1a0b2a,#3a1266); }
-.card.legendary{ box-shadow:0 0 25px gold; background:linear-gradient(145deg,#2a220b,#665012); }
-.card.mythic{ box-shadow:0 0 35px red; background:linear-gradient(145deg,#2a0b0b,#661212); }
-
-/* PREVIEW SCREEN RARITIES */
-#display.common{ background:linear-gradient(145deg,#1a1a1a,#2a2a2a); box-shadow:0 0 15px gray; }
-#display.rare{ background:linear-gradient(145deg,#0b1a2a,#123a66); box-shadow:0 0 20px #4da6ff; }
-#display.epic{ background:linear-gradient(145deg,#1a0b2a,#3a1266); box-shadow:0 0 25px #b84dff; }
-#display.legendary{ background:linear-gradient(145deg,#2a220b,#665012); box-shadow:0 0 30px gold; }
-#display.mythic{ background:linear-gradient(145deg,#2a0b0b,#661212); box-shadow:0 0 40px red; }
-
-/* locked */
-.locked img{
-  filter:blur(8px) grayscale(1);
-  transform:scale(1.1);
-}
-
-.card{
-  position:relative;
-}
-
-.card:hover{
-  transform: scale(1.03);
-}
-
-/* LOCKED STATE (NEW SYSTEM) */
-.card.locked{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:6px;
-  position:relative;
-}
-
-.card.locked img{
-  filter:blur(8px) grayscale(1);
-  transform:scale(1.1);
-}
-
-/* big ??? in center */
-.lockedText{
-  font-size:28px;
-  font-weight:bold;
-  letter-spacing:2px;
-}
-
-/* "Locked" text under it */
-.lockedSub{
-  font-size:14px;
-  color:#aaa;
-}
-
+.lockedText{font-size:26px;}
+.lockedSub{color:#aaa;font-size:14px;}
 </style>
 </head>
 
 <body>
 
-  <div class="app">
+<div class="app">
 
-    <!-- HEADER -->
-    <div class="header">
-      <div class="hud">
+  <!-- HEADER -->
+  <div class="header">
+    <div class="hud">
 
-        <div class="hudBox" id="rollBox">
-          Rolls: <span id="rolls">0</span>
-        </div>
-
-        <h1>theos RNG</h1>
-
-        <div class="hudBox" id="bestBox">
-          <span>Best:</span>
-          <span id="best">None</span>
-        </div>
-
+      <div class="hudBox">
+        Rolls: <span id="rolls">0</span>
       </div>
-    </div>
 
-    <!-- NAV -->
-    <div class="nav">
-      <div class="nav-inner">
-        <div class="blob" id="blob"></div>
+      <h1>theos RNG</h1>
 
-        <button class="tab active" onclick="showPage('roll', this)">Roll</button>
-        <button class="tab" onclick="showPage('inventory', this)">Inventory</button>
+      <div class="hudBox">
+        Best: <span id="best">None</span>
       </div>
+
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <div class="nav">
+    <div class="nav-inner">
+
+      <div class="blob" id="blob"></div>
+
+      <button class="tab" onclick="showPage('roll', this)">Roll</button>
+      <button class="tab" onclick="showPage('inventory', this)">Inventory</button>
+
+    </div>
+  </div>
+
+  <!-- ROLL PAGE -->
+  <div id="rollPage" class="page active">
+
+    <div id="display">
+      <img id="img" src="">
+      <div id="name">Press Roll</div>
+      <div id="odds"></div>
     </div>
 
-    <!-- MAIN CONTENT -->
-    <div id="rollPage" class="page active">
-      <div class="roll-area">
-
-        <div id="display">
-          <img id="img" src="https://i.pravatar.cc/150">
-          <div id="name">Press Roll</div>
-          <div id="odds"></div>
-        </div>
-
-        <button class="rollBtn" onclick="roll()">ROLL</button>
-
-      </div>
-    </div>
-
-    <div id="inventoryPage" class="page">
-      <div id="inventory" class="grid"></div>
-    </div>
+    <button class="rollBtn" onclick="roll()">ROLL</button>
 
   </div>
+
+  <!-- INVENTORY -->
+  <div id="inventoryPage" class="page">
+    <div id="inventory" class="grid"></div>
+  </div>
+
+</div>
+
+<script>
+const viewers = [
+  {name:"duck", odds:2, image:"https://i.pravatar.cc/120?img=1"},
+  {name:"alex", odds:4, image:"https://i.pravatar.cc/120?img=2"},
+  {name:"mike", odds:8, image:"https://i.pravatar.cc/120?img=3"},
+  {name:"john", odds:16, image:"https://i.pravatar.cc/120?img=4"}
+];
+
+let inventory = JSON.parse(localStorage.getItem("inv")||"{}");
+let rolls = Number(localStorage.getItem("rolls")||0);
+let best = JSON.parse(localStorage.getItem("best")) || null;
+
+document.getElementById("rolls").innerText = rolls;
+
+function rarity(o){
+  if(o<=5) return "common";
+  if(o<=25) return "rare";
+  if(o<=100) return "epic";
+  if(o<=1000) return "legendary";
+  return "mythic";
+}
+
+/* NAV */
+function showPage(page, btn){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById(page+"Page").classList.add("active");
+
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  btn.classList.add("active");
+
+  moveBlob(btn);
+}
+
+function moveBlob(btn){
+  const blob = document.getElementById("blob");
+  blob.style.width = btn.offsetWidth + "px";
+  blob.style.left = btn.offsetLeft + "px";
+}
+
+/* ROLL */
+function roll(){
+  const v = viewers[Math.floor(Math.random()*viewers.length)];
+
+  document.getElementById("img").src = v.image;
+  document.getElementById("name").innerText = v.name;
+  document.getElementById("odds").innerText = "1 in " + v.odds;
+
+  inventory[v.name] = (inventory[v.name]||0)+1;
+
+  if(!best || v.odds > best.odds){
+    best = v;
+    document.getElementById("best").innerText = v.name;
+  }
+
+  save();
+  render();
+}
+
+/* INVENTORY */
+function render(){
+  let inv = document.getElementById("inventory");
+  inv.innerHTML = "";
+
+  for(let v of viewers){
+    let owned = inventory[v.name];
+
+    inv.innerHTML += `
+      <div class="card ${owned ? rarity(v.odds) : ""}">
+        ${owned ? `
+          <img src="${v.image}">
+          <div>${v.name}</div>
+          <div>x${owned}</div>
+        ` : `
+          <div class="lockedText">???</div>
+          <div class="lockedSub">Locked</div>
+        `}
+      </div>
+    `;
+  }
+}
+
+function save(){
+  localStorage.setItem("inv", JSON.stringify(inventory));
+  localStorage.setItem("rolls", rolls);
+  localStorage.setItem("best", JSON.stringify(best));
+}
+
+/* INIT */
+render();
+window.onload=()=>moveBlob(document.querySelector(".tab"));
+</script>
 
 </body>
 </html>
