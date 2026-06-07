@@ -48,6 +48,9 @@ body{
   background:transparent;
   border:none;
   color:white;
+  padding: 10px 28px;
+  min-width: 110px;
+  text-align: center;
   font-size:16px;
   padding:10px 25px;
   cursor:pointer;
@@ -342,9 +345,10 @@ body{
 
 function moveBlob(btn){
   const blob = document.getElementById("blob");
+  const parent = btn.parentElement;
 
   blob.style.width = btn.offsetWidth + "px";
-  blob.style.left = btn.offsetLeft + "px";
+  blob.style.left = (btn.offsetLeft) + "px";
 }
 
 /* VIEWERS */
