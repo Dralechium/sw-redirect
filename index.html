@@ -22,17 +22,18 @@ body{
 }
 
 .nav{
-  position:relative;
-  display:flex;
-  justify-content:center;
-  gap:20px;
-  padding:6px 10px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
 
-  border:2px solid #42ff29;
-  border-radius:999px;
+  padding: 8px 12px;
 
-  background:rgba(0,0,0,0.35);
-  box-shadow:0 0 15px rgba(66,255,41,0.25);
+  border: 2px solid #42ff29;
+  border-radius: 999px;
+
+  background: rgba(0,0,0,0.35);
+  overflow: hidden; /* 🔥 THIS is what stops escape */
 }
 
 .nav-frame{
@@ -54,15 +55,18 @@ body{
 }
 
 .blob{
-  position:absolute;
-  height:100%;
-  width:100px;
-  background:#42ff29;
-  border-radius:20px;
-  transition:0.3s ease;
-  z-index:1;
-  opacity:0.25;
-  left:0;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+
+  border-radius: 999px;
+
+  background: #42ff29;
+  opacity: 0.25;
+
+  z-index: 1;
+
+  transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .page{
@@ -341,14 +345,9 @@ body{
 
 function moveBlob(btn){
   const blob = document.getElementById("blob");
-  const nav = document.querySelector(".nav");
 
-  const navRect = nav.getBoundingClientRect();
-  const btnRect = btn.getBoundingClientRect();
-
-  blob.style.width = btnRect.width + "px";
-
-  blob.style.left = (btnRect.left - navRect.left) + "px";
+  blob.style.width = btn.offsetWidth + "px";
+  blob.style.left = btn.offsetLeft + "px";
 }
 
 /* VIEWERS */
