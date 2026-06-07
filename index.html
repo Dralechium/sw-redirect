@@ -705,6 +705,30 @@ function spawnSparkles(color){
   }
 }
 
+window.previewCutscene = function(type){
+
+  // pick a random viewer of that rarity
+  const pool = viewers.filter(v => rarity(v.odds) === type);
+
+  if(pool.length === 0) return;
+
+  const v = pool[Math.floor(Math.random() * pool.length)];
+
+  // show the card visually (but DO NOT save anything)
+  show(v);
+
+  // play cutscene animation only
+  window.playCutscene(type);
+};
+
+previewCutscene("legendary");
+previewCutscene("mythic");
+previewCutscene("epic");
+previewCutscene("rare");
+previewCutscene("common");
+
+window.cutscene = window.previewCutscene;
+
 window.playCutscene = function(type){
   const overlay = document.getElementById("cutsceneOverlay");
   const red = document.getElementById("redLight");
