@@ -27,19 +27,19 @@ body{
   position: absolute;
   inset: 0;
 
+  opacity: 0;
   background: radial-gradient(
-    circle at center,
+    ellipse at center,
     rgba(255,0,0,0.9) 0%,
-    rgba(255,0,0,0.4) 20%,
-    rgba(0,0,0,0.95) 60%,
-    black 100%
+    rgba(255,0,0,0.5) 15%,
+    rgba(0,0,0,0.95) 60%
   );
 
-  transform: scaleX(0.2) scaleY(0.2);
-  opacity: 0;
+  transform: scaleY(0.25) scaleX(0.8);
 
-  transition: transform 3s cubic-bezier(0.22, 1, 0.36, 1),
-              opacity 1s ease;
+  transition:
+    transform 3s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.2s ease;
 }
 
 @keyframes mythicCutscene {
@@ -679,48 +679,45 @@ window.playCutscene = function(type){
   const red = document.getElementById("redLight");
   const display = document.getElementById("display");
 
-  // reset
+  // RESET
   overlay.style.opacity = "1";
-  red.style.transition = "none";
-  red.style.transform = "scaleX(0.2) scaleY(0.2)";
-  red.style.opacity = "0";
-
-  display.style.transition = "opacity 0.3s ease";
   display.style.opacity = "0";
 
-  // PHASE 1: BLACK HOLD (0–3s)
+  red.style.transition = "none";
+  red.style.opacity = "0";
+  red.style.transform = "scaleY(0.25) scaleX(0.8)";
+
+  // PHASE 1: BLACK HOLD (0–2s)
   setTimeout(() => {
-    red.style.transition = "opacity 0.4s ease, transform 3s cubic-bezier(0.22,1,0.36,1)";
+    red.style.transition =
+      "transform 3s cubic-bezier(0.22,1,0.36,1), opacity 0.2s ease";
     red.style.opacity = "1";
 
-    // PHASE 2 START (3s → 8s)
-    red.style.transform = "scaleX(3) scaleY(1.5)";
-  }, 3000);
+    // PHASE 2 START (2s → 5.2s)
+    red.style.transform = "scaleY(0.35) scaleX(2)";
+  }, 2000);
 
-  // mid expansion intensify
+  // mid expansion (keeps band feel)
   setTimeout(() => {
-    red.style.transform = "scaleX(6) scaleY(3)";
-  }, 4500);
+    red.style.transform = "scaleY(0.45) scaleX(4)";
+  }, 3200);
 
-  // full screen saturation
+  // near-final stretch (still not full screen)
   setTimeout(() => {
-    red.style.transform = "scaleX(10) scaleY(6)";
-  }, 6500);
+    red.style.transform = "scaleY(0.6) scaleX(6)";
+  }, 4400);
 
-  // PHASE 3: fade out red
+  // PHASE 3: FINAL BURST (last 0.3s)
   setTimeout(() => {
+    red.style.transition = "opacity 0.3s ease";
     red.style.opacity = "0";
-  }, 8000);
+  }, 5000);
 
-  // reveal card
+  // instant reveal AFTER fade
   setTimeout(() => {
+    overlay.style.opacity = "0"; // no lingering black effect
     display.style.opacity = "1";
-  }, 8500);
-
-  // reset overlay after
-  setTimeout(() => {
-    overlay.style.opacity = "0";
-  }, 9000);
+  }, 5300);
 }
 
 </script>
