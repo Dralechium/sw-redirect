@@ -659,22 +659,23 @@ window.playCutscene = function(type){
   const display = document.getElementById("display");
 
   overlay.style.animation = "none";
-  overlay.offsetHeight; // reset trick
+  void overlay.offsetWidth; // better reset trick
 
- if(type === "mythic"){
-  overlay.style.animation = "mythicCutscene 1.6s ease forwards";
+  if(type === "mythic"){
+    overlay.style.animation = "mythicCutscene 1.6s ease forwards";
+  }
+
+  if(type === "legendary"){
+    overlay.style.animation = "mythicCutscene 1.1s ease forwards";
+  }
+
+  display.style.transition = "opacity 0.2s ease";
+  display.style.opacity = "0";
+
+  setTimeout(() => {
+    display.style.opacity = "1";
+  }, 1200);
 }
-
-if(type === "legendary"){
-  overlay.style.animation = "mythicCutscene 1.1s ease forwards";
-}
-
- display.style.transition = "opacity 0.2s ease";
-display.style.opacity = "0";
-
-setTimeout(() => {
-  display.style.opacity = "1";
-}, 1200);
 
 </script>
 <div id="cutsceneOverlay"></div>
