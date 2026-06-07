@@ -15,7 +15,7 @@ body{
   overflow:hidden;
 }
 
-/* APP WRAPPER */
+/* APP */
 .app{
   display:flex;
   flex-direction:column;
@@ -24,28 +24,17 @@ body{
 
 /* HEADER */
 .header{
+  width:100%;
   text-align:center;
   padding:15px;
   background:#111;
   border-bottom:2px solid #222;
-  width:100%;
 }
 
 .hud{
   display:grid;
   grid-template-columns:1fr auto 1fr;
   align-items:center;
-  padding:10px 20px;
-}
-
-.hudBox{
-  padding:12px 18px;
-  border-radius:12px;
-  background:#1a1a1a;
-  border:2px solid #42ff29;
-  font-size:16px;
-  font-weight:bold;
-  box-shadow:0 0 10px rgba(66,255,41,0.3);
 }
 
 /* NAV */
@@ -66,16 +55,15 @@ body{
 }
 
 .tab{
-  font-family:'Orbitron', Arial;
   padding:12px 50px;
   background:transparent;
   border:none;
   color:white;
   cursor:pointer;
   z-index:2;
+  font-family:'Orbitron';
 }
 
-/* MOVING BLOB */
 .blob{
   position:absolute;
   top:0;
@@ -84,44 +72,32 @@ body{
   background:#42ff29;
   opacity:0.25;
   border-radius:999px;
-  transition:0.35s cubic-bezier(0.22,1,0.36,1);
+  transition:0.3s;
   z-index:1;
 }
 
 /* PAGES */
-.page{
-  display:none;
-}
-
-.page.active{
-  display:block;
-}
+.page{display:none;}
+.page.active{display:block;}
 
 /* DISPLAY */
 #display{
   width:360px;
   margin:20px auto;
   padding:20px;
-  border-radius:15px;
   background:#181818;
+  border-radius:15px;
   text-align:center;
-}
-
-#display img{
-  width:120px;
-  height:120px;
-  border-radius:50%;
 }
 
 /* BUTTON */
 .rollBtn{
   padding:18px 70px;
-  font-size:20px;
   border:none;
   border-radius:12px;
-  cursor:pointer;
   background:#5865F2;
   color:white;
+  cursor:pointer;
 }
 
 /* INVENTORY */
@@ -134,19 +110,12 @@ body{
 
 .card{
   background:#1a1a1a;
-  border-radius:12px;
   padding:10px;
+  border-radius:12px;
   text-align:center;
-  min-height:170px;
 }
 
-/* RARITIES */
-.card.common{box-shadow:0 0 8px gray;}
-.card.rare{box-shadow:0 0 12px #4da6ff;}
-.card.epic{box-shadow:0 0 18px #b84dff;}
-.card.legendary{box-shadow:0 0 25px gold;}
-.card.mythic{box-shadow:0 0 35px red;}
-
+/* locked */
 .lockedText{font-size:26px;}
 .lockedSub{color:#aaa;font-size:14px;}
 </style>
@@ -160,15 +129,11 @@ body{
   <div class="header">
     <div class="hud">
 
-      <div class="hudBox">
-        Rolls: <span id="rolls">0</span>
-      </div>
+      <div>Rolls: <span id="rolls">0</span></div>
 
       <h1>theos RNG</h1>
 
-      <div class="hudBox">
-        Best: <span id="best">None</span>
-      </div>
+      <div>Best: <span id="best">None</span></div>
 
     </div>
   </div>
@@ -185,11 +150,11 @@ body{
     </div>
   </div>
 
-  <!-- ROLL PAGE -->
+  <!-- ROLL -->
   <div id="rollPage" class="page active">
 
     <div id="display">
-      <img id="img" src="">
+      <img id="img" width="120">
       <div id="name">Press Roll</div>
       <div id="odds"></div>
     </div>
@@ -209,8 +174,7 @@ body{
 const viewers = [
   {name:"duck", odds:2, image:"https://i.pravatar.cc/120?img=1"},
   {name:"alex", odds:4, image:"https://i.pravatar.cc/120?img=2"},
-  {name:"mike", odds:8, image:"https://i.pravatar.cc/120?img=3"},
-  {name:"john", odds:16, image:"https://i.pravatar.cc/120?img=4"}
+  {name:"mike", odds:8, image:"https://i.pravatar.cc/120?img=3"}
 ];
 
 let inventory = JSON.parse(localStorage.getItem("inv")||"{}");
@@ -218,14 +182,6 @@ let rolls = Number(localStorage.getItem("rolls")||0);
 let best = JSON.parse(localStorage.getItem("best")) || null;
 
 document.getElementById("rolls").innerText = rolls;
-
-function rarity(o){
-  if(o<=5) return "common";
-  if(o<=25) return "rare";
-  if(o<=100) return "epic";
-  if(o<=1000) return "legendary";
-  return "mythic";
-}
 
 /* NAV */
 function showPage(page, btn){
@@ -240,13 +196,13 @@ function showPage(page, btn){
 
 function moveBlob(btn){
   const blob = document.getElementById("blob");
-  blob.style.width = btn.offsetWidth + "px";
-  blob.style.left = btn.offsetLeft + "px";
+  blob.style.width = btn.offsetWidth+"px";
+  blob.style.left = btn.offsetLeft+"px";
 }
 
 /* ROLL */
 function roll(){
-  const v = viewers[Math.floor(Math.random()*viewers.length)];
+  let v = viewers[Math.floor(Math.random()*viewers.length)];
 
   document.getElementById("img").src = v.image;
   document.getElementById("name").innerText = v.name;
@@ -266,15 +222,15 @@ function roll(){
 /* INVENTORY */
 function render(){
   let inv = document.getElementById("inventory");
-  inv.innerHTML = "";
+  inv.innerHTML="";
 
   for(let v of viewers){
     let owned = inventory[v.name];
 
     inv.innerHTML += `
-      <div class="card ${owned ? rarity(v.odds) : ""}">
+      <div class="card">
         ${owned ? `
-          <img src="${v.image}">
+          <img src="${v.image}" width="70">
           <div>${v.name}</div>
           <div>x${owned}</div>
         ` : `
@@ -292,7 +248,6 @@ function save(){
   localStorage.setItem("best", JSON.stringify(best));
 }
 
-/* INIT */
 render();
 window.onload=()=>moveBlob(document.querySelector(".tab"));
 </script>
