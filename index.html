@@ -27,6 +27,26 @@ body{
   justify-self:center;
 }
 
+.best-common{
+  color:gray;
+}
+
+.best-rare{
+  color:#4da6ff;
+}
+
+.best-epic{
+  color:#b84dff;
+}
+
+.best-legendary{
+  color:gold;
+}
+
+.best-mythic{
+  color:#ff4d4d;
+}  
+
 .hud{
   display:grid;
   grid-template-columns:1fr auto 1fr;
@@ -201,8 +221,9 @@ body{
     <h1>theos RNG</h1>
 
     <div class="hudBox" id="bestBox">
-      Best: <span id="best">None</span>
-    </div>
+  <span>Best:</span>
+  <span id="best">None</span>
+</div>
 
   </div>
 
@@ -250,8 +271,14 @@ let best = JSON.parse(localStorage.getItem("best")) || null;
 
 document.getElementById("rolls").innerText = rolls;
 if(best){
-  document.getElementById("best").innerText =
+  const bestText = document.getElementById("best");
+
+  bestText.innerText =
     `${best.name} (1/${best.odds})`;
+
+  bestText.classList.add(
+    "best-" + rarity(best.odds)
+  );
 }
 
 /* RARITY */
@@ -357,10 +384,14 @@ function finish(v){
   inventory[v.name] = (inventory[v.name] || 0) + 1;
 
   if(!best || v.odds > best.odds){
-    best = { name:v.name, odds:v.odds };
+  best = { name:v.name, odds:v.odds };
 
-    document.getElementById("best").innerText =
-      `${best.name} (1/${best.odds})`;
+  const bestText = document.getElementById("best");
+  bestText.innerText = `${best.name} (1/${best.odds})`;
+
+  bestText.className = "";
+  bestText.classList.add("best-" + rarity(best.odds));
+}
   }
 
   save();
