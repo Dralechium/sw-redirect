@@ -23,6 +23,7 @@ body{
 
 .nav{
   position: relative;
+
   display: flex;
   justify-content: center;
   align-items: center;
@@ -31,14 +32,14 @@ body{
   border-radius: 999px;
   background: rgba(0,0,0,0.35);
 
-  margin: 18px auto 22px auto; /* top | horizontal | bottom */
+  margin: 18px auto 22px auto;
 
-  width: fit-content;
-  height: 56px;            /* IMPORTANT */
-  padding: 0;              /* IMPORTANT */
+  width: max-content;   /* IMPORTANT CHANGE */
+  min-width: 260px;     /* ensures it never collapses too small */
+  height: 56px;
 
-  box-sizing: border-box;  /* IMPORTANT */
-  overflow: hidden;        /* IMPORTANT (fixes edge gap illusion) */
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .nav-inner{
@@ -72,11 +73,14 @@ body{
   position: absolute;
   top: 0;
   bottom: 0;
+
   left: 0;
+
+  height: 100%;
+  border-radius: 999px;
 
   background: #42ff29;
   opacity: 0.25;
-  border-radius: 999px;
 
   z-index: 1;
 
