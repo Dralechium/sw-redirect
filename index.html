@@ -627,7 +627,26 @@ window.onload = () => {
 };
 
 window.cutscene = function(type){
-  playCutscene(type);
+  window.playCutscene(type);
+}
+
+window.playCutscene = function(type){
+  const cutscene = document.getElementById("cutscene");
+
+  cutscene.style.animation = "none";
+  cutscene.offsetHeight;
+
+  if(type === "mythic"){
+    cutscene.style.animation = "flashRed 1.2s ease";
+  }
+
+  if(type === "legendary"){
+    cutscene.style.animation = "flashPurple 0.9s ease";
+  }
+
+  cutscene.addEventListener("animationend", () => {
+    cutscene.style.animation = "";
+  }, { once:true });
 }
 
 </script>
