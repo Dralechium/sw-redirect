@@ -684,10 +684,6 @@ window.cutscene = function(type){
   window.playCutscene(type);
 }
 
-function easeInExpo(t){
-  return t === 0 ? 0 : Math.pow(2, 10 * (t - 1));
-}
-
 function spawnSparkles(color){
   const holder = document.getElementById("sparkles");
 
@@ -704,6 +700,24 @@ function spawnSparkles(color){
     setTimeout(() => s.remove(), 2000);
   }
 }
+
+function easeInExpo(t){
+  return t === 0 ? 0 : Math.pow(2, 10 * (t - 1));
+}
+
+window.playCutscene = function(type){
+  const overlay = document.getElementById("cutsceneOverlay");
+  const red = document.getElementById("redLight");
+  const display = document.getElementById("display");
+
+  if(type === "legendary"){
+    red.style.setProperty("--cutscene-color-bright", "rgba(255,215,0,0.95)");
+    red.style.setProperty("--cutscene-color-mid", "rgba(255,215,0,0.5)");
+  } else {
+    // mythic
+    red.style.setProperty("--cutscene-color-bright", "rgba(255,0,0,0.95)");
+    red.style.setProperty("--cutscene-color-mid", "rgba(255,0,0,0.5)");
+  }
 
 window.previewCutscene = function(type){
 
@@ -727,22 +741,15 @@ previewCutscene("epic");
 previewCutscene("rare");
 previewCutscene("common");
 
-window.cutscene = window.previewCutscene;
-
-window.playCutscene = function(type){
-  const overlay = document.getElementById("cutsceneOverlay");
-  const red = document.getElementById("redLight");
-  const display = document.getElementById("display");
-
-  if(type === "legendary"){
-    red.style.setProperty("--cutscene-color-bright", "rgba(255,215,0,0.95)");
-    red.style.setProperty("--cutscene-color-mid", "rgba(255,215,0,0.5)");
-  } else {
-    // mythic
-    red.style.setProperty("--cutscene-color-bright", "rgba(255,0,0,0.95)");
-    red.style.setProperty("--cutscene-color-mid", "rgba(255,0,0,0.5)");
+window.cutscene = function(type){
+  if(typeof window.playCutscene !== "function"){
+    console.error("playCutscene is not loaded yet");
+    return;
   }
 
+  window.previewCutscene(type);
+};
+  
   const start = performance.now();
 
   const FADE_TO_BLACK = 300;
