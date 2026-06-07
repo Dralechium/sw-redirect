@@ -22,30 +22,25 @@ body{
 }
 
 .nav{
+  display: flex;
+  justify-content: center;
+  margin: 18px 0 22px;
+}
+
+.nav-inner{
   position: relative;
 
   display: flex;
-  justify-content: center;
   align-items: center;
 
   border: 2px solid #42ff29;
   border-radius: 999px;
+
   background: rgba(0,0,0,0.35);
 
-  margin: 18px auto 22px auto;
-
-  width: max-content;   /* IMPORTANT CHANGE */
-  min-width: 260px;     /* ensures it never collapses too small */
   height: 56px;
 
-  box-sizing: border-box;
-  overflow: hidden;
-}
-
-.nav-inner{
-  display: flex;
-  gap: 0;
-  height: 100%;
+  padding: 0 4px;   /* IMPORTANT: fixes edge clipping */
 }
 
 .nav-frame{
@@ -71,14 +66,12 @@ body{
 
 .blob{
   position: absolute;
-  top: 0;
-  bottom: 0;
+  top: 2px;
+  bottom: 2px;
 
   left: 0;
 
-  height: 100%;
   border-radius: 999px;
-
   background: #42ff29;
   opacity: 0.25;
 
@@ -358,14 +351,14 @@ body{
 
 function moveBlob(btn){
   const blob = document.getElementById("blob");
+  const parent = document.querySelector(".nav-inner");
 
-  const parent = btn.parentElement;
   const parentRect = parent.getBoundingClientRect();
   const btnRect = btn.getBoundingClientRect();
 
   const left = btnRect.left - parentRect.left;
 
-  blob.style.width = btn.offsetWidth + "px";
+  blob.style.width = btnRect.width + "px";
   blob.style.left = left + "px";
 }
 
