@@ -25,56 +25,20 @@ body{
 }
 
 #redLight{
-  position: absolute;
+  position: fixed;
   inset: 0;
 
   opacity: 0;
+  pointer-events: none;
+
   background: radial-gradient(
-    ellipse at center,
-    rgba(255,0,0,0.9) 0%,
-    rgba(255,0,0,0.4) 20%,
-    rgba(0,0,0,0.95) 65%
+    circle at center,
+    rgba(255,0,0,0.0) 0%,
+    rgba(255,0,0,0.0) 25%,
+    rgba(0,0,0,1) 70%
   );
 
-  transform: scaleY(0.25) scaleX(0.8);
-
-  transition:
-    transform 3s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.2s ease;
-}
-
-@keyframes mythicCutscene {
-  0% {
-    opacity: 0;
-    background: black;
-    transform: scale(1);
-  }
-
-  10% {
-    opacity: 1;
-    background: black;
-  }
-
-  35% {
-    opacity: 1;
-    background: radial-gradient(circle at center,
-      rgba(255,0,0,0.9) 0%,
-      rgba(120,0,0,0.6) 25%,
-      rgba(0,0,0,1) 70%);
-  }
-
-  70% {
-    opacity: 1;
-    background: radial-gradient(circle at center,
-      rgba(255,0,0,1) 0%,
-      rgba(255,0,0,0.2) 40%,
-      rgba(0,0,0,1) 80%);
-  }
-
-  100% {
-    opacity: 0;
-    background: black;
-  }
+  transform: scale(0.2);
 }
 
 #cutscene{
@@ -461,10 +425,6 @@ html, body {
   moveBlob(btn);
 }
 
-function easeInExpo(t){
-  return t === 0 ? 0 : Math.pow(2, 10 * (t - 1));
-}
-
 function moveBlob(btn){
   const blob = document.getElementById("blob");
 
@@ -679,6 +639,10 @@ window.cutscene = function(type){
   window.playCutscene(type);
 }
 
+function easeInExpo(t){
+  return t === 0 ? 0 : Math.pow(2, 12 * (t - 1)); // stronger = faster peak
+}
+
 window.playCutscene = function(type){
   const overlay = document.getElementById("cutsceneOverlay");
   const red = document.getElementById("redLight");
@@ -688,15 +652,17 @@ window.playCutscene = function(type){
 
   const FADE_IN = 300;
   const HOLD_BLACK = 700;
-  const RED_START = FADE_IN + HOLD_BLACK; // 1000ms
-  const RED_DURATION = 4500; // 4.5s total
+
+  const RED_START = FADE_IN + HOLD_BLACK;
+
+  const RED_DURATION = 3700; // 🔥 0.8s faster than 4500
 
   overlay.style.transition = "none";
-  overlay.style.opacity = "0";
-
   red.style.transition = "none";
+
+  overlay.style.opacity = "0";
   red.style.opacity = "0";
-  red.style.transform = "scale(0.2, 0.2)";
+  red.style.transform = "scale(0.2)";
 
   display.style.transition = "opacity 0.2s ease";
   display.style.opacity = "0";
@@ -704,40 +670,54 @@ window.playCutscene = function(type){
   function frame(now){
     const t = now - start;
 
-    // PHASE 1: fade to black
+    // 1) fade to black
     if(t < FADE_IN){
       overlay.style.opacity = t / FADE_IN;
     }
 
-    // PHASE 2: hold black
+    // 2) hold black
     else if(t < RED_START){
       overlay.style.opacity = 1;
     }
 
-    // PHASE 3: red growth (smooth exponential)
-    else if(t < RED_START + RED_DURATION){
-      const p = (t - RED_START) / RED_DURATION;
-      const e = easeInExpo(p);
-
+    // 3) red fade-in (FIX: no more instant appearance)
+    else if(t < RED_START + 400){
       overlay.style.opacity = 1;
+
+      const p = (t - RED_START) / 400;
+
+      red.style.opacity = p; // smooth fade-in
+      red.style.transform = `scale(${0.2 + p * 0.3})`;
+    }
+
+    // 4) main exponential growth phase
+    else if(t < RED_START + RED_DURATION){
+      const p = (t - (RED_START + 400)) / (RED_DURATION - 400);
+
+      const e = easeInExpo(p);
 
       red.style.opacity = 1;
 
-      // smooth “filling” effect
-      const scaleX = 0.2 + e * 6;   // horizontal spread
-      const scaleY = 0.2 + e * 2.5; // vertical leak
+      const scaleX = 0.5 + e * 6.5;
+      const scaleY = 0.3 + e * 3;
 
       red.style.transform = `scale(${scaleX}, ${scaleY})`;
     }
 
-    // PHASE 4: burst + reveal
+    // 5) FINAL FULL SCREEN BURST (important fix)
+    else if(t < RED_START + RED_DURATION + 250){
+      red.style.opacity = 1;
+
+      // force full-screen red
+      red.style.transform = "scale(20, 12)";
+    }
+
+    // 6) fade out + reveal instantly
     else{
-      red.style.transform = "scale(10, 6)";
-      red.style.opacity = "0";
+      red.style.opacity = 0;
+      overlay.style.opacity = 0;
 
-      overlay.style.opacity = "0";
-
-      display.style.opacity = "1";
+      display.style.opacity = 1;
       return;
     }
 
