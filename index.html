@@ -637,7 +637,28 @@ window.onload = () => {
 };
 
 window.cutscene = function(type){
-  window.playCutscene(type);
+
+  const rarityViewers = viewers.filter(v => rarity(v.odds) === type);
+
+  if(rarityViewers.length > 0){
+    const preview =
+      rarityViewers[Math.floor(Math.random() * rarityViewers.length)];
+
+    show(preview);
+  }
+
+  playCutscene(type);
+}
+
+window.showcard = function(name){
+  const viewer = viewers.find(
+    v => v.name.toLowerCase() === name.toLowerCase()
+  );
+
+  if(viewer){
+    show(viewer);
+    playCutscene(rarity(viewer.odds));
+  }
 }
 
 function easeInExpo(t){
