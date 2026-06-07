@@ -19,26 +19,27 @@ body{
   background: black;
   opacity: 0;
   pointer-events: none;
-  z-index: 9999;
-
-  transition: opacity 0.3s ease;
+  z-index: 9998;
 }
 
 #redLight{
   position: fixed;
   inset: 0;
+  pointer-events: none;
+  z-index: 9999;
 
   opacity: 0;
-  pointer-events: none;
+  transform: scale(0.2);
 
+  /* IMPORTANT: stronger visible core */
   background: radial-gradient(
     circle at center,
-    rgba(255,0,0,0.0) 0%,
-    rgba(255,0,0,0.0) 25%,
-    rgba(0,0,0,1) 70%
+    rgba(255, 0, 0, 0.95) 0%,
+    rgba(255, 0, 0, 0.5) 20%,
+    rgba(0, 0, 0, 0) 55%
   );
 
-  transform: scale(0.2);
+  filter: blur(2px);
 }
 
 #cutscene{
@@ -640,7 +641,7 @@ window.cutscene = function(type){
 }
 
 function easeInExpo(t){
-  return t === 0 ? 0 : Math.pow(2, 12 * (t - 1)); // stronger = faster peak
+  return t === 0 ? 0 : Math.pow(2, 10 * (t - 1));
 }
 
 window.playCutscene = function(type){
@@ -650,47 +651,45 @@ window.playCutscene = function(type){
 
   const start = performance.now();
 
-  const FADE_IN = 300;
-  const HOLD_BLACK = 700;
+  const FADE_TO_BLACK = 300;
+  const BLACK_HOLD = 700;
 
-  const RED_START = FADE_IN + HOLD_BLACK;
-
-  const RED_DURATION = 3700; // 🔥 0.8s faster than 4500
+  const RED_START = FADE_TO_BLACK + BLACK_HOLD;
+  const RED_DURATION = 3500;
 
   overlay.style.transition = "none";
   red.style.transition = "none";
 
-  overlay.style.opacity = "0";
-  red.style.opacity = "0";
+  overlay.style.opacity = 0;
+  red.style.opacity = 0;
   red.style.transform = "scale(0.2)";
 
-  display.style.transition = "opacity 0.2s ease";
-  display.style.opacity = "0";
+  display.style.opacity = 0;
 
   function frame(now){
     const t = now - start;
 
-    // 1) fade to black
-    if(t < FADE_IN){
-      overlay.style.opacity = t / FADE_IN;
+    /* 1. fade to black */
+    if(t < FADE_TO_BLACK){
+      overlay.style.opacity = t / FADE_TO_BLACK;
     }
 
-    // 2) hold black
+    /* 2. hold black */
     else if(t < RED_START){
       overlay.style.opacity = 1;
     }
 
-    // 3) red fade-in (FIX: no more instant appearance)
+    /* 3. red fade in (SMOOTH, not instant) */
     else if(t < RED_START + 400){
       overlay.style.opacity = 1;
 
       const p = (t - RED_START) / 400;
 
-      red.style.opacity = p; // smooth fade-in
-      red.style.transform = `scale(${0.2 + p * 0.3})`;
+      red.style.opacity = p;
+      red.style.transform = `scale(${0.2 + p * 0.4})`;
     }
 
-    // 4) main exponential growth phase
+    /* 4. exponential expansion */
     else if(t < RED_START + RED_DURATION){
       const p = (t - (RED_START + 400)) / (RED_DURATION - 400);
 
@@ -698,21 +697,20 @@ window.playCutscene = function(type){
 
       red.style.opacity = 1;
 
-      const scaleX = 0.5 + e * 6.5;
-      const scaleY = 0.3 + e * 3;
+      // controlled expansion (not insane stretch)
+      const scaleX = 0.6 + e * 7;
+      const scaleY = 0.4 + e * 3.5;
 
       red.style.transform = `scale(${scaleX}, ${scaleY})`;
     }
 
-    // 5) FINAL FULL SCREEN BURST (important fix)
-    else if(t < RED_START + RED_DURATION + 250){
+    /* 5. full screen burst */
+    else if(t < RED_START + RED_DURATION + 200){
       red.style.opacity = 1;
-
-      // force full-screen red
-      red.style.transform = "scale(20, 12)";
+      red.style.transform = "scale(25, 15)";
     }
 
-    // 6) fade out + reveal instantly
+    /* 6. fade out + reveal instantly */
     else{
       red.style.opacity = 0;
       overlay.style.opacity = 0;
@@ -728,8 +726,8 @@ window.playCutscene = function(type){
 };
 
 </script>
-<div id="cutsceneOverlay">
-  <div id="redLight"></div>
+<div id="cutsceneOverlay"></div>
+<div id="redLight"></div>
 </div>
 </body>
 </html>
