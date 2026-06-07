@@ -265,19 +265,6 @@ const viewers = [
 
 const defaultViewer = viewers[viewers.length - 1];
 
-/* DATA */
-let inventory = JSON.parse(localStorage.getItem("inv")||"{}");
-let rolls = Number(localStorage.getItem("rolls")||0);
-let best = JSON.parse(localStorage.getItem("best")) || null;
-
-document.getElementById("rolls").innerText = rolls;
-if(best){
-  const bestText = document.getElementById("best");
-
-  bestText.innerText =
-    `${best.name} (1/${best.odds})`;
-}
-
 /* RARITY */
 function rarity(o){
   if(o<=5) return "common";
@@ -285,6 +272,25 @@ function rarity(o){
   if(o<=100) return "epic";
   if(o<=1000) return "legendary";
   return "mythic";
+}
+
+/* DATA */
+let inventory = JSON.parse(localStorage.getItem("inv")||"{}");
+let rolls = Number(localStorage.getItem("rolls")||0);
+let best = JSON.parse(localStorage.getItem("best")) || null;
+
+document.getElementById("rolls").innerText = rolls;
+
+if(best){
+  const bestText = document.getElementById("best");
+
+  bestText.innerText = `${best.name} (1/${best.odds})`;
+
+  // IMPORTANT: reset old classes first
+  bestText.className = "";
+
+  // apply correct color based on rarity
+  bestText.classList.add("best-" + rarity(best.odds));
 }
 
 /* RNG */
