@@ -637,8 +637,26 @@ window.onload = () => {
 };
 
 window.cutscene = function(type){
-  window.playCutscene(type);
-}
+  // normalize input
+  type = type.toLowerCase();
+
+  // get all viewers of that rarity
+  const pool = viewers.filter(v => rarity(v.odds) === type);
+
+  if(pool.length === 0){
+    console.log("No cards found for rarity:", type);
+    return;
+  }
+
+  // pick random card
+  const v = pool[Math.floor(Math.random() * pool.length)];
+
+  // show visually ONLY (no inventory, no rolls)
+  show(v);
+
+  // trigger cutscene
+  playCutscene(type);
+};
 
 function easeInExpo(t){
   return t === 0 ? 0 : Math.pow(2, 10 * (t - 1));
