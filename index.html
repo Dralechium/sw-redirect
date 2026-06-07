@@ -689,21 +689,22 @@ window.playCutscene = function(type){
       red.style.transform = `scale(${0.2 + p * 0.4})`;
     }
 
-    /* 4. exponential expansion */
-    else if(t < RED_START + RED_DURATION){
-      const p = (t - (RED_START + 400)) / (RED_DURATION - 400);
+/* 4. exponential expansion (NO SHAPE SWITCH) */
+else if(t < RED_START + RED_DURATION){
+  const p = (t - (RED_START + 400)) / (RED_DURATION - 400);
 
-      const e = easeInExpo(p);
+  const e = easeInExpo(p);
 
-      red.style.opacity = 1;
+  red.style.opacity = 1;
 
-      // controlled expansion (not insane stretch)
-      const scaleX = 0.6 + e * 7;
-      const scaleY = 0.4 + e * 3.5;
+  // 👇 FIX: keep uniform scaling base, then "breathing stretch"
+  const base = 0.6 + e * 8;
 
-      red.style.transform = `scale(${scaleX}, ${scaleY})`;
+  // very subtle distortion ONLY (prevents visible shape jump)
+  const stretch = 1 + (Math.sin(e * Math.PI) * 0.15);
+
+  red.style.transform = `scale(${base * stretch})`;
     }
-
     /* 5. full screen burst */
     else if(t < RED_START + RED_DURATION + 200){
       red.style.opacity = 1;
