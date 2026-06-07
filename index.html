@@ -350,11 +350,17 @@ body{
 }
 
 function moveBlob(btn){
+  const nav = document.querySelector(".nav");
   const blob = document.getElementById("blob");
-  const parent = btn.parentElement;
 
-  blob.style.width = btn.offsetWidth + "px";
-  blob.style.left = (btn.offsetLeft) + "px";
+  const navRect = nav.getBoundingClientRect();
+  const btnRect = btn.getBoundingClientRect();
+
+  const left = btnRect.left - navRect.left;
+  const width = btnRect.width;
+
+  blob.style.width = width + "px";
+  blob.style.left = left + "px";
 }
 
 /* VIEWERS */
