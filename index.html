@@ -23,19 +23,25 @@ body{
 
 .nav{
   position: relative;
+  display: flex;
+  justify-content: center;
+  backdrop-filter: blur(6px);
+
   border: 2px solid #42ff29;
   border-radius: 999px;
   background: rgba(0,0,0,0.35);
-  display: flex;
-  justify-content: center;
+
+  width: fit-content;     /* 👈 important */
+  margin: 10px auto;      /* 👈 centers it */
+  padding: 6px;           /* 👈 gives breathing room inside border */
 }
 
 .nav-inner{
   position: relative;
   display: flex;
   gap: 20px;
-
-  padding: 8px 12px; /* moved here */
+  padding: 8px 12px;
+  align-items: center;
 }
 
 .nav-frame{
