@@ -51,6 +51,57 @@ body{
   z-index: 9999;
 }
 
+#sparkles{
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9997;
+}
+
+@keyframes cardReveal {
+
+  0%{
+    transform: scale(1.25) rotate(0deg);
+  }
+
+  15%{
+    transform: scale(1.22) rotate(-8deg);
+  }
+
+  30%{
+    transform: scale(1.20) rotate(8deg);
+  }
+
+  45%{
+    transform: scale(1.18) rotate(-6deg);
+  }
+
+  60%{
+    transform: scale(1.15) rotate(6deg);
+  }
+
+  100%{
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.revealAnimation{
+  animation: cardReveal 1.8s ease-out forwards;
+}
+
+@keyframes sparkleAnim{
+
+  0%{
+    opacity:1;
+    transform:scale(0);
+  }
+
+  100%{
+    opacity:0;
+    transform:translateY(-100px) scale(1.5);
+  }
+}
+
 @keyframes flashPurple {
   0% { opacity: 0; background: black; }
   20% { opacity: 1; background: #7a00ff; }
@@ -157,6 +208,13 @@ html, body {
   text-shadow:0 0 10px #42ff29;
   margin:0;
   justify-self:center;
+}
+
+.sparkle{
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
 }
 
 .best-common{
@@ -437,6 +495,31 @@ function moveBlob(btn){
 
   blob.style.width = btn.offsetWidth + "px";
   blob.style.left = left + "px";
+}
+
+function spawnSparkles(color){
+
+  const holder = document.getElementById("sparkles");
+
+  for(let i = 0; i < 25; i++){
+
+    const s = document.createElement("div");
+
+    s.className = "sparkle";
+
+    s.style.background = color;
+
+    s.style.left = (window.innerWidth/2 + (Math.random()-0.5)*300) + "px";
+
+    s.style.top = (window.innerHeight/2 + (Math.random()-0.5)*200) + "px";
+
+    s.style.animation =
+      `sparkleAnim ${1 + Math.random()}s ease-out forwards`;
+
+    holder.appendChild(s);
+
+    setTimeout(() => s.remove(), 2000);
+  }
 }
 
 /* VIEWERS */
@@ -762,7 +845,9 @@ window.playCutscene = function(type){
     else{
       red.style.opacity = 0;
       overlay.style.opacity = 0;
-
+      display.classList.remove("revealAnimation");
+      void display.offsetWidth;
+      display.classList.add("revealAnimation");
       display.style.opacity = 1;
       return;
     }
@@ -773,6 +858,17 @@ window.playCutscene = function(type){
   requestAnimationFrame(frame);
 };
 
+if(type === "legendary"){
+  spawnSparkles("#ffd700");
+}
+
+if(type === "mythic"){
+  spawnSparkles("#ff3030");
+}
+
+transform: perspective(1000px) rotateY(...)
+
+<div id="sparkles"></div>
 </script>
 <div id="cutsceneOverlay"></div>
 <div id="redLight"></div>
