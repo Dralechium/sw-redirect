@@ -752,6 +752,28 @@ window.playCutscene = function(type){
   requestAnimationFrame(frame);
 };
 
+window.showCard = function(name){
+  const v = viewers.find(x => x.name.toLowerCase() === name.toLowerCase());
+  if(!v){
+    console.log("Card not found:", name);
+    return;
+  }
+
+  const r = rarity(v.odds);
+
+  // show visually
+  show(v);
+
+  // optional: reset animation feel
+  const display = document.getElementById("display");
+  display.style.opacity = 1;
+
+  // CUTSCENE TRIGGER (only for high rarity like your roll system)
+  if(r === "legendary" || r === "mythic"){
+    playCutscene(r);
+  }
+};
+
 </script>
 <div id="cutsceneOverlay"></div>
 <div id="redLight"></div>
