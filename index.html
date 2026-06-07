@@ -341,8 +341,14 @@ body{
 
 function moveBlob(btn){
   const blob = document.getElementById("blob");
-  blob.style.width = btn.offsetWidth + "px";
-  blob.style.left = btn.offsetLeft + "px";
+  const nav = document.querySelector(".nav");
+
+  const navRect = nav.getBoundingClientRect();
+  const btnRect = btn.getBoundingClientRect();
+
+  blob.style.width = btnRect.width + "px";
+
+  blob.style.left = (btnRect.left - navRect.left) + "px";
 }
 
 /* VIEWERS */
