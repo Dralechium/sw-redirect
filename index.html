@@ -13,6 +13,31 @@ body{
   color:white;
 }
 
+#cutscene{
+  position: fixed;
+  inset: 0;
+  background: black;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+@keyframes flashPurple {
+  0% { opacity: 0; background: black; }
+  20% { opacity: 1; background: #7a00ff; }
+  40% { opacity: 0; }
+  60% { opacity: 1; background: #7a00ff; }
+  100% { opacity: 0; }
+}
+
+@keyframes flashRed {
+  0% { opacity: 0; background: black; }
+  25% { opacity: 1; background: red; }
+  50% { opacity: 0; }
+  75% { opacity: 1; background: darkred; }
+  100% { opacity: 0; }
+}
+
 html, body {
   height: 100%;
   overflow: hidden;
@@ -365,6 +390,25 @@ html, body {
     document.getElementById("inventoryPage").classList.add("active");
   }
 
+  function playCutscene(type){
+  const cutscene = document.getElementById("cutscene");
+
+  cutscene.style.animation = "none";
+  cutscene.offsetHeight; // reset trick
+
+  if(type === "mythic"){
+    cutscene.style.animation = "flashRed 1.2s ease";
+  }
+
+  if(type === "legendary"){
+    cutscene.style.animation = "flashPurple 0.9s ease";
+  }
+
+  cutscene.addEventListener("animationend", () => {
+    cutscene.style.animation = "";
+  }, { once:true });
+}
+
   // update active button
   document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
   btn.classList.add("active");
@@ -521,6 +565,12 @@ function finish(v){
 
   inventory[v.name] = (inventory[v.name] || 0) + 1;
 
+  const r = rarity(v.odds);
+
+  if(r === "legendary" || r === "mythic"){
+    playCutscene(r);
+  }
+
   if(!best || v.odds > best.odds){
     best = { name:v.name, odds:v.odds };
 
@@ -576,7 +626,11 @@ window.onload = () => {
   moveBlob(firstTab);
 };
 
-</script>
+window.cutscene = function(type){
+  playCutscene(type);
+}
 
+</script>
+<div id="cutscene"></div>
 </body>
 </html>
