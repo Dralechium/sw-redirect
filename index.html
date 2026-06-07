@@ -280,283 +280,56 @@ body{
 
 <body>
 
-<!-- HEADER -->
-<div class="header">
+  <div class="app">
 
-  <div class="hud">
+    <!-- HEADER -->
+    <div class="header">
+      <div class="hud">
 
-    <div class="hudBox" id="rollBox">
-      Rolls: <span id="rolls">0</span>
+        <div class="hudBox" id="rollBox">
+          Rolls: <span id="rolls">0</span>
+        </div>
+
+        <h1>theos RNG</h1>
+
+        <div class="hudBox" id="bestBox">
+          <span>Best:</span>
+          <span id="best">None</span>
+        </div>
+
+      </div>
     </div>
 
-    <h1>theos RNG</h1>
+    <!-- NAV -->
+    <div class="nav">
+      <div class="nav-inner">
+        <div class="blob" id="blob"></div>
 
-    <div class="hudBox" id="bestBox">
-      <span>Best:</span>
-      <span id="best">None</span>
+        <button class="tab active" onclick="showPage('roll', this)">Roll</button>
+        <button class="tab" onclick="showPage('inventory', this)">Inventory</button>
+      </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="rollPage" class="page active">
+      <div class="roll-area">
+
+        <div id="display">
+          <img id="img" src="https://i.pravatar.cc/150">
+          <div id="name">Press Roll</div>
+          <div id="odds"></div>
+        </div>
+
+        <button class="rollBtn" onclick="roll()">ROLL</button>
+
+      </div>
+    </div>
+
+    <div id="inventoryPage" class="page">
+      <div id="inventory" class="grid"></div>
     </div>
 
   </div>
-
-</div>
-
-<!-- NAV (tabs) -->
-<div class="nav">
-
-  <div class="nav-inner">
-
-    <div class="blob" id="blob"></div>
-
-    <button class="tab active" onclick="showPage('roll', this)">Roll</button>
-    <button class="tab" onclick="showPage('inventory', this)">Inventory</button>
-
-  </div>
-
-</div>
-
-<!-- GAME -->
-<div id="rollPage" class="page active">
-
-  <div class="roll-area">
-
-    <div id="display">
-      <img id="img" src="https://i.pravatar.cc/150">
-      <div id="name">Press Roll</div>
-      <div id="odds"></div>
-    </div>
-
-    <button class="rollBtn" onclick="roll()">ROLL</button>
-
-  </div>
-
-</div>
-
-<!-- INVENTORY -->
-<div id="inventoryPage" class="page">
-  <div id="inventory" class="grid"></div>
-</div>
-<script>
-  function showPage(page, btn){
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-
-  if(page === "roll"){
-    document.getElementById("rollPage").classList.add("active");
-  } else {
-    document.getElementById("inventoryPage").classList.add("active");
-  }
-
-  // update active button
-  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-  btn.classList.add("active");
-
-  moveBlob(btn);
-}
-
-function moveBlob(btn){
-  const blob = document.getElementById("blob");
-
-  const parent = btn.parentElement;
-  const parentRect = parent.getBoundingClientRect();
-  const btnRect = btn.getBoundingClientRect();
-
-  const left = btnRect.left - parentRect.left;
-
-  blob.style.width = btn.offsetWidth + "px";
-  blob.style.left = left + "px";
-}
-
-/* VIEWERS */
-const viewers = [
-  {name:"duckwithsunnies", odds:2, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/6ef3b0ef-bc0b-463d-a3d9-1f2a646a534f-profile_image-70x70.png"},
-  {name:"ilee_ez", odds:4, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/e0efcfce-7516-4589-9bcf-5c6ec63a8a76-profile_image-70x70.png"},
-  {name:"ztatsukii_", odds:8, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/4fd5ffe5-6799-4f4e-b470-f1420f1caee4-profile_image-70x70.jpeg"},
-  {name:"Shunkohh", odds:16, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/2a1751b4-a94c-4c97-9fa7-3168b6a2768f-profile_image-70x70.png"},
-  {name:"41unc", odds:25, image:"https://cdn.discordapp.com/avatars/820266716537815040/396a0ee557222daf4c58ed975aad5e59.webp?size=1024"},
-  {name:"AbyssFDK", odds:50, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/84332b83-3f01-4ce3-9860-abb0a671fb5c-profile_image-70x70.jpeg"},
-  {name:"gmdbon", odds:100, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/45da4302-a7a6-4bc8-a320-f7ebac40d84f-profile_image-70x70.png"},
-  {name:"midgatal", odds:500, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/bc185f86-30d2-4422-b547-5f4e3c504d54-profile_image-70x70.png"},
-  {name:"IVDrale", odds:1000, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/6e71f426-65ca-4914-b6e8-0e5499f032cb-profile_image-70x70.png"},
-  {name:"Christ_Is_God", odds:5000, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/98b31c09-fa8b-4318-88bd-ef8a0443b772-profile_image-70x70.png"},
-  {name:"theosGMD", odds:10000, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/0ffc8233-6b32-411e-bfbd-4167c09cc2a2-profile_image-70x70.png"}
-];
-
-const defaultViewer = viewers[viewers.length - 1];
-
-/* RARITY */
-function rarity(o){
-  if(o<=5) return "common";
-  if(o<=25) return "rare";
-  if(o<=100) return "epic";
-  if(o<=1000) return "legendary";
-  return "mythic";
-}
-
-/* DATA */
-let inventory = JSON.parse(localStorage.getItem("inv")||"{}");
-let rolls = Number(localStorage.getItem("rolls")||0);
-let best = JSON.parse(localStorage.getItem("best")) || null;
-
-document.getElementById("rolls").innerText = rolls;
-
-const bestText = document.getElementById("best");
-
-if(best){
-  bestText.innerText = `${best.name} (1/${best.odds})`;
-  bestText.className = "";
-  bestText.classList.add("best-" + rarity(best.odds));
-} else {
-  bestText.innerText = "None";
-  bestText.className = "";
-}
-/* RNG */
-function pick(){
-  // weighted selection so commons appear more often during flicker
-  const weights = viewers.map(v => 1 / v.odds);
-
-  let total = weights.reduce((a,b)=>a+b,0);
-  let r = Math.random() * total;
-
-  for(let i = 0; i < viewers.length; i++){
-    r -= weights[i];
-    if(r <= 0) return viewers[i];
-  }
-
-  return viewers[0];
-}
-
-/* ROLL */
-let running=false;
-
-function roll(){
-  if(running) return;
-  running = true;
-
-  rolls++;
-  document.getElementById("rolls").innerText = rolls;
-
-  const start = performance.now();
-  const rollDuration = 3000;
-
-  function visualPick(){
-    return viewers[Math.floor(Math.random() * viewers.length)];
-  }
-
-  function weightedPick(){
-    let total = 0;
-
-    for (let v of viewers) {
-      total += 1 / v.odds;
-    }
-
-    let r = Math.random() * total;
-
-    let acc = 0;
-    for (let v of viewers) {
-      acc += 1 / v.odds;
-      if (r <= acc) return v;
-    }
-  }
-
-  function frame(t){
-    let p = (t - start) / rollDuration;
-    if(p > 1) p = 1;
-
-    let delay = 35 + (220 * p);
-
-    if(p < 1){
-      let v = visualPick();
-      show(v);
-
-      setTimeout(() => requestAnimationFrame(frame), delay);
-
-    } else {
-      let final = weightedPick();
-      show(final);
-      finish(final);
-      running = false;
-    }
-  }
-
-  requestAnimationFrame(frame);
-}
-
-/* SHOW */
-function show(v){
-  const display = document.getElementById("display");
-
-  document.getElementById("img").src = v.image;
-  document.getElementById("name").innerText = v.name;
-  document.getElementById("odds").innerText = "1 in " + v.odds;
-
-  // IMPORTANT: fully reset classes every time
-  display.className = "";
-
-  // re-apply correct rarity class
-  const r = rarity(v.odds);
-  display.classList.add(r);
-}
-
-/* FINISH */
-function finish(v){
-
-  inventory[v.name] = (inventory[v.name] || 0) + 1;
-
-  if(!best || v.odds > best.odds){
-    best = { name:v.name, odds:v.odds };
-
-    const bestText = document.getElementById("best");
-    bestText.innerText = `${best.name} (1/${best.odds})`;
-
-    bestText.className = "";
-    bestText.classList.add("best-" + rarity(best.odds));
-  }
-
-  save();
-  render();
-}
-
-/* INVENTORY */
-function render(){
-  let inv = document.getElementById("inventory");
-  inv.innerHTML = "";
-
-  for(let v of viewers){
-    let owned = inventory[v.name];
-
-    inv.innerHTML += `
-  <div class="card ${owned ? rarity(v.odds) : "locked"}">
-    
-    ${owned ? `
-      <img src="${v.image}">
-      <div>${v.name}</div>
-      <div>1 in ${v.odds}</div>
-      <div>x${owned}</div>
-    ` : `
-      <div class="lockedText">???</div>
-      <div class="lockedSub">Locked</div>
-    `}
-    
-  </div>
-`;
-  }
-}
-
-function save(){
-  localStorage.setItem("inv", JSON.stringify(inventory));
-  localStorage.setItem("rolls", rolls);
-  localStorage.setItem("best", JSON.stringify(best));
-}
-
-/* START */
-show(defaultViewer);
-render();
-
-window.onload = () => {
-  const firstTab = document.querySelector(".tab");
-  moveBlob(firstTab);
-};
-
-</script>
 
 </body>
 </html>
