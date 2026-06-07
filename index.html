@@ -13,6 +13,11 @@ body{
   color:white;
 }
 
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
 /* HEADER + HUD */
 .header{
   text-align:center;
@@ -22,30 +27,28 @@ body{
 }
 
 .nav{
-  position: relative;
-
   display: flex;
   justify-content: center;
-  align-items: center;
+  margin: 18px auto 22px auto;
+
+  width: 100%;
+}
+
+.nav-inner{
+  position: relative;
+  display: flex;
 
   border: 2px solid #42ff29;
   border-radius: 999px;
   background: rgba(0,0,0,0.35);
 
-  margin: 18px auto 22px auto;
-
-  width: max-content;   /* IMPORTANT CHANGE */
-  min-width: 260px;     /* ensures it never collapses too small */
   height: 56px;
+
+  width: max-content;
+  min-width: 260px;
 
   box-sizing: border-box;
   overflow: hidden;
-}
-
-.nav-inner{
-  display: flex;
-  gap: 0;
-  height: 100%;
 }
 
 .nav-frame{
