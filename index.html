@@ -25,21 +25,26 @@ body{
   position: relative;
   display: flex;
   justify-content: center;
+  align-items: center;
+
   border: 2px solid #42ff29;
   border-radius: 999px;
   background: rgba(0,0,0,0.35);
-  margin: 10px auto;
-  width: fit-content;
 
-  padding: 6px;
-  height: 55px;
-  align-items: center;
+  margin: 10px auto;
+
+  width: fit-content;
+  height: 56px;            /* IMPORTANT */
+  padding: 0;              /* IMPORTANT */
+
+  box-sizing: border-box;  /* IMPORTANT */
+  overflow: hidden;        /* IMPORTANT (fixes edge gap illusion) */
 }
 
 .nav-inner{
-  position: relative;
   display: flex;
-  gap: 0;                  /* ❗ remove spacing gap */
+  gap: 0;
+  height: 100%;
 }
 
 .nav-frame{
@@ -49,26 +54,29 @@ body{
 }
 
 .tab{
+  font-family: 'Orbitron', Arial, sans-serif;
+  height: 100%;
+  padding: 0 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   background: transparent;
   border: none;
   color: white;
-  font-family: 'Orbitron', Arial, sans-serif;
-  font-size: 16px;
-  padding: 14px 40px;   /* wider = full segment feel */
-  cursor: pointer;
-  position: relative;
   z-index: 2;
 }
 
 .blob{
   position: absolute;
-  top: 6px;
-  bottom: 6px;
+  top: 0;
+  bottom: 0;
   left: 0;
 
-  border-radius: 999px;
   background: #42ff29;
   opacity: 0.25;
+  border-radius: 999px;
 
   z-index: 1;
 
