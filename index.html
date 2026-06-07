@@ -16,10 +16,30 @@ body{
 #cutsceneOverlay{
   position: fixed;
   inset: 0;
-  background: black;
   opacity: 0;
   pointer-events: none;
   z-index: 9999;
+
+  background: black;
+}
+
+#redLight{
+  position: absolute;
+  inset: 0;
+
+  background: radial-gradient(
+    circle at center,
+    rgba(255,0,0,0.9) 0%,
+    rgba(255,0,0,0.4) 20%,
+    rgba(0,0,0,0.95) 60%,
+    black 100%
+  );
+
+  transform: scaleX(0.2) scaleY(0.2);
+  opacity: 0;
+
+  transition: transform 3s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 1s ease;
 }
 
 @keyframes mythicCutscene {
@@ -656,28 +676,56 @@ window.cutscene = function(type){
 
 window.playCutscene = function(type){
   const overlay = document.getElementById("cutsceneOverlay");
+  const red = document.getElementById("redLight");
   const display = document.getElementById("display");
 
-  overlay.style.animation = "none";
-  void overlay.offsetWidth; // better reset trick
+  // reset
+  overlay.style.opacity = "1";
+  red.style.transition = "none";
+  red.style.transform = "scaleX(0.2) scaleY(0.2)";
+  red.style.opacity = "0";
 
-  if(type === "mythic"){
-    overlay.style.animation = "mythicCutscene 1.6s ease forwards";
-  }
-
-  if(type === "legendary"){
-    overlay.style.animation = "mythicCutscene 1.1s ease forwards";
-  }
-
-  display.style.transition = "opacity 0.2s ease";
+  display.style.transition = "opacity 0.3s ease";
   display.style.opacity = "0";
 
+  // PHASE 1: BLACK HOLD (0–3s)
+  setTimeout(() => {
+    red.style.transition = "opacity 0.4s ease, transform 3s cubic-bezier(0.22,1,0.36,1)";
+    red.style.opacity = "1";
+
+    // PHASE 2 START (3s → 8s)
+    red.style.transform = "scaleX(3) scaleY(1.5)";
+  }, 3000);
+
+  // mid expansion intensify
+  setTimeout(() => {
+    red.style.transform = "scaleX(6) scaleY(3)";
+  }, 4500);
+
+  // full screen saturation
+  setTimeout(() => {
+    red.style.transform = "scaleX(10) scaleY(6)";
+  }, 6500);
+
+  // PHASE 3: fade out red
+  setTimeout(() => {
+    red.style.opacity = "0";
+  }, 8000);
+
+  // reveal card
   setTimeout(() => {
     display.style.opacity = "1";
-  }, 1200);
+  }, 8500);
+
+  // reset overlay after
+  setTimeout(() => {
+    overlay.style.opacity = "0";
+  }, 9000);
 }
 
 </script>
-<div id="cutsceneOverlay"></div>
+<div id="cutsceneOverlay">
+  <div id="redLight"></div>
+</div>
 </body>
 </html>
