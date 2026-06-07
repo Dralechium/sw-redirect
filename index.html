@@ -31,15 +31,15 @@ body{
   opacity: 0;
   transform: scale(0.2);
 
-  /* IMPORTANT: stronger visible core */
   background: radial-gradient(
     circle at center,
-    rgba(255, 0, 0, 0.95) 0%,
-    rgba(255, 0, 0, 0.5) 20%,
-    rgba(0, 0, 0, 0) 55%
+    var(--cutscene-color-bright) 0%,
+    var(--cutscene-color-mid) 20%,
+    rgba(0,0,0,0) 55%
   );
 
   filter: blur(2px);
+  will-change: transform, opacity;
 }
 
 #cutscene{
@@ -647,6 +647,31 @@ function easeInExpo(t){
 window.playCutscene = function(type){
   const overlay = document.getElementById("cutsceneOverlay");
   const red = document.getElementById("redLight");
+
+  if(type === "legendary"){
+    red.style.setProperty(
+      "--cutscene-color-bright",
+      "rgba(255,215,0,0.95)"
+    );
+
+    red.style.setProperty(
+      "--cutscene-color-mid",
+      "rgba(255,215,0,0.5)"
+    );
+  }
+  else{
+    // mythic
+    red.style.setProperty(
+      "--cutscene-color-bright",
+      "rgba(255,0,0,0.95)"
+    );
+
+    red.style.setProperty(
+      "--cutscene-color-mid",
+      "rgba(255,0,0,0.5)"
+    );
+  }
+
   const display = document.getElementById("display");
 
   const start = performance.now();
@@ -689,22 +714,23 @@ window.playCutscene = function(type){
       red.style.transform = `scale(${0.2 + p * 0.4})`;
     }
 
-/* 4. exponential expansion (NO SHAPE SWITCH) */
-else if(t < RED_START + RED_DURATION){
-  const p = (t - (RED_START + 400)) / (RED_DURATION - 400);
+    /* 4. exponential expansion (NO SHAPE SWITCH) */
+    else if(t < RED_START + RED_DURATION){
+      const p = (t - (RED_START + 400)) / (RED_DURATION - 400);
 
-  const e = easeInExpo(p);
+      const e = easeInExpo(p);
 
-  red.style.opacity = 1;
+      red.style.opacity = 1;
 
-  // 👇 FIX: keep uniform scaling base, then "breathing stretch"
-  const base = 0.6 + e * 8;
+      // keep uniform scaling base, then breathing stretch
+      const base = 0.6 + e * 8;
 
-  // very subtle distortion ONLY (prevents visible shape jump)
-  const stretch = 1 + (Math.sin(e * Math.PI) * 0.15);
+      // subtle distortion only
+      const stretch = 1 + (Math.sin(e * Math.PI) * 0.15);
 
-  red.style.transform = `scale(${base * stretch})`;
+      red.style.transform = `scale(${base * stretch})`;
     }
+
     /* 5. full screen burst */
     else if(t < RED_START + RED_DURATION + 200){
       red.style.opacity = 1;
