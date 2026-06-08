@@ -526,97 +526,80 @@ function spawnCardSparklesOn(el, rarityType){
   const rect = el.getBoundingClientRect();
 
   const corners = [
-    { x: 0, y: rect.height },
-    { x: rect.width, y: 0 }
+    { x: 0, y: rect.height },      // bottom-left
+    { x: rect.width, y: 0 }        // top-right
   ];
 
   for (const corner of corners) {
 
-  const isBottomLeft = (corner.x === 0 && corner.y === rect.height);
-
-  for (let i = 0; i < 2; i++) {
-
-    const s = document.createElement("div");
-    s.className = "cardSparkle";
-    s.style.color = color;
-
-    // BIG sparkle = front, SMALL = back
-    const isBig = (i === 0);
-
-    const size = isBig ? 56 : 32;
-    s.style.width = size + "px";
-    s.style.height = size + "px";
-
-    let x = corner.x;
-    let y = corner.y;
-
-    let jitterX, jitterY;
-
-// DEFAULT behavior (other corners)
-if (!isBottomLeft && !isTopRight) {
-  jitterX = isBig ? -2 : 3;
-  jitterY = isBig ? 3 : -2;
-}
-
-  // bottom-left special (keep your existing logic)
-  else if (isBottomLeft) {
-    if (isBig) {
-      jitterX = 0;
-      jitterY = 0;
-    } else {
-      jitterX = 10;
-      jitterY = -10;
-    }
-  }
-  
-  // 🔥 TOP-RIGHT: swap big/small spacing
-  else if (isTopRight) {
-    if (isBig) {
-      // BIG moves slightly inward (was small behavior)
-      jitterX = -10;
-      jitterY = 10;
-    } else {
-      // SMALL sits closer to edge (was big behavior)
-      jitterX = 0;
-      jitterY = 0;
-    }
-  }
-
     const isBottomLeft = (corner.x === 0 && corner.y === rect.height);
-    const isTopRight = (corner.x === rect.width && corner.y === 0);
-    
-    // 👉 SPECIAL RULE: bottom-left flip layering
-    if (isBottomLeft) {
+    const isTopRight   = (corner.x === rect.width && corner.y === 0);
 
-      if (isBig) {
-        // BIG sparkle sits directly on edge
-        jitterX = 0;
-        jitterY = 0;
-      } else {
-        // SMALL sparkle sits behind (inward offset)
-        jitterX = 10;
-        jitterY = -10;
+    for (let i = 0; i < 2; i++) {
+
+      const s = document.createElement("div");
+      s.className = "cardSparkle";
+      s.style.color = color;
+
+      const isBig = (i === 0);
+
+      const size = isBig ? 56 : 32;
+      s.style.width = size + "px";
+      s.style.height = size + "px";
+
+      let x = corner.x;
+      let y = corner.y;
+
+      let jitterX = 0;
+      let jitterY = 0;
+
+      // DEFAULT
+      if (!isBottomLeft && !isTopRight) {
+        jitterX = isBig ? -2 : 3;
+        jitterY = isBig ? 3 : -2;
       }
-    }
 
-    s.style.left = (x + jitterX) + "px";
-    s.style.top = (y + jitterY) + "px";
+      // 🔥 bottom-left (your original rule)
+      else if (isBottomLeft) {
+        if (isBig) {
+          jitterX = 0;
+          jitterY = 0;
+        } else {
+          jitterX = 10;
+          jitterY = -10;
+        }
+      }
 
-    const offset = isBig ? 0 : 6;
+      // 🔥 TOP-RIGHT (SWAPPED big/small behavior)
+      else if (isTopRight) {
+        if (isBig) {
+          // BIG now goes INWARD
+          jitterX = -10;
+          jitterY = 10;
+        } else {
+          // SMALL sits on edge
+          jitterX = 0;
+          jitterY = 0;
+        }
+      }
 
-    const dx = (corner.x === 0 ? -1 : 1) * offset;
-    const dy = (corner.y === 0 ? -1 : 1) * offset;
+      s.style.left = (x + jitterX) + "px";
+      s.style.top = (y + jitterY) + "px";
 
-    s.style.setProperty("--dx", dx + "px");
-    s.style.setProperty("--dy", dy + "px");
+      const offset = isBig ? 0 : 6;
+      const dx = (corner.x === 0 ? -1 : 1) * offset;
+      const dy = (corner.y === 0 ? -1 : 1) * offset;
 
-    // layering control (IMPORTANT)
-    s.style.zIndex = isBig ? 2 : 1;
+      s.style.setProperty("--dx", dx + "px");
+      s.style.setProperty("--dy", dy + "px");
 
-    el.appendChild(s);
+      s.style.zIndex = isBig ? 2 : 1;
+
+      el.appendChild(s);
     }
   }
 }
+
 /* VIEWERS */
 const viewers = [
   {name:"duckwithsunnies", odds:2, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/6ef3b0ef-bc0b-463d-a3d9-1f2a646a534f-profile_image-70x70.png"},
