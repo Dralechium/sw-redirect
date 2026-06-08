@@ -731,6 +731,13 @@ function finish(v){
     bestText.classList.add("best-" + rarity(best.odds));
   }
 
+    const colors = {
+    rare: "#4da6ff",
+    epic: "#b84dff",
+    legendary: "#ffd700",
+    mythic: "#ff3030"
+  };
+  
   save();
   render();
 }
@@ -918,26 +925,25 @@ window.showCard = function(name){
   }
 
   const r = rarity(v.odds);
+
   const colors = {
     rare: "#4da6ff",
     epic: "#b84dff",
     legendary: "#ffd700",
     mythic: "#ff3030"
   };
-  
+
   if(r !== "common" && colors[r]){
     spawnCardSparkles(colors[r]);
   }
-}
 
   // show visually
   show(v);
 
-  // optional: reset animation feel
   const display = document.getElementById("display");
   display.style.opacity = 1;
 
-  // CUTSCENE TRIGGER (only for high rarity like your roll system)
+  // cutscene trigger
   if(r === "legendary" || r === "mythic"){
     playCutscene(r);
   }
