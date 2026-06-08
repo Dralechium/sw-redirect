@@ -51,6 +51,23 @@ body{
   z-index: 9999;
 }
 
+@keyframes sparklePulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.9) rotate(0deg);
+    opacity: 0.7;
+  }
+
+  50% {
+    transform: translate(-50%, -50%) scale(1.25) rotate(15deg);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(0.9) rotate(0deg);
+    opacity: 0.7;
+  }
+}
+
 @keyframes flashPurple {
   0% { opacity: 0; background: black; }
   20% { opacity: 1; background: #7a00ff; }
@@ -319,8 +336,8 @@ html, body {
   pointer-events:none;
   filter: drop-shadow(0 0 6px currentColor);
 
-  transform: translate(-50%, -50%);
-  animation:sparkleFloat 1.8s ease-out forwards;
+  transform: translate(-50%, -50%) scale(1);
+  animation: sparklePulse 1.6s ease-in-out infinite;
 }
 
 .cardSparkle::before{
@@ -527,11 +544,13 @@ function spawnCardSparkles(rarityType){
       s.style.color = color;
 
       // anchor EXACTLY on edge
-      s.style.left = corner.x + "px";
-      s.style.top = corner.y + "px";
+      s.style.left = (corner.x + jitterX) + "px";
+      s.style.top = (corner.y + jitterY) + "px";
 
       // one big, one small
       const size = (i === 0) ? 28 : 16;
+      const jitterX = (i === 0 ? -2 : 3);
+      const jitterY = (i === 0 ? 3 : -2);
       s.style.width = size + "px";
       s.style.height = size + "px";
 
@@ -548,7 +567,6 @@ function spawnCardSparkles(rarityType){
 
       display.appendChild(s);
 
-      setTimeout(() => s.remove(), 1800);
     }
   }
 }
