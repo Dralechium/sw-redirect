@@ -529,36 +529,45 @@ const side = Math.floor(Math.random() * 4);
 
 let x, y;
 
+const half = size / 2;
+
 if (side === 0) {
-  // TOP EDGE (exactly on top border)
+  // TOP
   x = Math.random() * rect.width;
-  y = 0;
+  y = -half;
 }
 
 else if (side === 1) {
-  // RIGHT EDGE
-  x = rect.width;
+  // RIGHT
+  x = rect.width + half;
   y = Math.random() * rect.height;
 }
 
 else if (side === 2) {
-  // BOTTOM EDGE
+  // BOTTOM
   x = Math.random() * rect.width;
-  y = rect.height;
+  y = rect.height + half;
 }
 
 else {
-  // LEFT EDGE
-  x = 0;
+  // LEFT
+  x = -half;
   y = Math.random() * rect.height;
 }
 
-    s.style.left = x + "px";
-    s.style.top = y + "px";
+    s.style.left = `${x}px`;
+    s.style.top = `${y}px`;
 
     /* unchanged animation logic */
-    const dx = Math.cos(Math.random() * Math.PI * 2) * (30 + Math.random() * 60);
-    const dy = Math.sin(Math.random() * Math.PI * 2) * (30 + Math.random() * 60);
+    let dx = 0;
+    let dy = 0;
+    
+    const speed = 30 + Math.random() * 60;
+    
+    if(side === 0) dy = -speed;          // top goes up
+    else if(side === 1) dx = speed;      // right goes right
+    else if(side === 2) dy = speed;      // bottom goes down
+    else dx = -speed;                    // left goes left
 
     s.style.setProperty("--dx", dx + "px");
     s.style.setProperty("--dy", dy + "px");
