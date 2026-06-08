@@ -317,7 +317,7 @@ html, body {
 .cardSparkle{
   position:absolute;
   pointer-events:none;
-  filter: drop-shadow(0 0 4px currentColor);
+  filter: drop-shadow(0 0 6px currentColor);
   width:12px;
   height:12px;
 
@@ -509,41 +509,59 @@ function spawnCardSparkles(rarityType){
   if(!color) return;
 
   const sparklePairs = [
-    // top-right corner
-    { x: rect.width - 6, y: 6 },
+    // TOP RIGHT (fixed)
+    {
+      baseX: rect.width - 10,
+      baseY: 10,
+      biggerIndex: 0 // upper sparkle is bigger
+    },
 
-    // bottom-left corner
-    { x: 6, y: rect.height - 6 }
+    // BOTTOM LEFT (fixed)
+    {
+      baseX: 10,
+      baseY: rect.height - 10,
+      biggerIndex: 1 // lower sparkle is bigger
+    }
   ];
 
-  for (let i = 0; i < sparklePairs.length; i++) {
+  for (const corner of sparklePairs) {
 
-    const base = sparklePairs[i];
-
-    // create 2 sparkles per corner (like your drawing)
-    for (let j = 0; j < 2; j++) {
+    for (let i = 0; i < 2; i++) {
 
       const s = document.createElement("div");
       s.className = "cardSparkle";
       s.style.color = color;
 
-      const size = 10 + Math.random() * 10;
-      s.style.width = size + "px";
-      s.style.height = size + "px";
+      // FIXED positioning (no randomness anymore)
+      let x = corner.baseX;
+      let y = corner.baseY;
 
-      // slight offset so they "hug" corner but don't overlap perfectly
-      const offsetX = (Math.random() - 0.5) * 10;
-      const offsetY = (Math.random() - 0.5) * 10;
+      // slight separation so they don’t overlap perfectly
+      const spread = 8;
 
-      const x = base.x + offsetX;
-      const y = base.y + offsetY;
+      if (i === 0) y -= spread; // upper sparkle
+      if (i === 1) y += spread; // lower sparkle
 
       s.style.left = x + "px";
       s.style.top = y + "px";
 
-      // tiny float so they feel alive but still anchored
-      const dx = (Math.random() - 0.5) * 15;
-      const dy = (Math.random() - 0.5) * 15;
+      // SIZE RULES:
+      // top-right: upper bigger
+      // bottom-left: lower bigger
+      let size = 10;
+
+      if (i === corner.biggerIndex) {
+        size = 18; // main sparkle
+      } else {
+        size = 11; // secondary sparkle
+      }
+
+      s.style.width = size + "px";
+      s.style.height = size + "px";
+
+      // subtle float ONLY (no position randomness)
+      const dx = (Math.random() - 0.5) * 10;
+      const dy = (Math.random() - 0.5) * 10;
 
       s.style.setProperty("--dx", dx + "px");
       s.style.setProperty("--dy", dy + "px");
