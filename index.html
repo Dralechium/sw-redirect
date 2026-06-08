@@ -685,12 +685,12 @@ function show(v){
   document.getElementById("name").innerText = v.name;
   document.getElementById("odds").innerText = "1 in " + v.odds;
 
-  // IMPORTANT: fully reset classes every time
   display.className = "";
-
-  // re-apply correct rarity class
   const r = rarity(v.odds);
   display.classList.add(r);
+
+  // 🔥 IMPORTANT: remove old sparkles whenever card changes
+  display.querySelectorAll(".cardSparkle").forEach(e => e.remove());
 }
 
 /* FINISH */
