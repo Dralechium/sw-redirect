@@ -258,6 +258,13 @@ html, body {
 
 #odds{ color:#aaa; }
 
+#sparkles{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:10000;
+}
+
 .rollBtn{
   padding:18px 70px;
   font-size:20px;
@@ -315,27 +322,44 @@ html, body {
 
 .cardSparkle{
   position:absolute;
+  width:14px;
+  height:14px;
+  transform:rotate(45deg);
   pointer-events:none;
-
-  width:12px;
-  height:12px;
 
   animation:sparkleFloat 1.8s ease-out forwards;
 }
 
-.cardSparkle::before{
+.cardSparkle::before,
+.cardSparkle::after{
   content:"";
-
   position:absolute;
-  inset:0;
+
+  left:50%;
+  top:50%;
 
   background:currentColor;
 
-  transform:rotate(45deg);
+  transform:translate(-50%, -50%);
+  border-radius:999px;
+}
+
+.cardSparkle::before{
+  width:2px;
+  height:100%;
 
   box-shadow:
-    0 0 8px currentColor,
-    0 0 16px currentColor;
+    0 0 6px currentColor,
+    0 0 12px currentColor;
+}
+
+.cardSparkle::after{
+  width:100%;
+  height:2px;
+
+  box-shadow:
+    0 0 6px currentColor,
+    0 0 12px currentColor;
 }
 
 /* rarity glow + color themes */
@@ -489,53 +513,68 @@ function spawnCardSparkles(color){
   const holder = document.getElementById("sparkles");
   const card = document.getElementById("display");
 
+  if(!holder || !card) return;
+
   const rect = card.getBoundingClientRect();
 
-  for(let i = 0; i < 40; i++){
+  for(let i = 0; i < 30; i++){
 
+    const s = document.createElement("div");
+    s.className = "cardSparkle";
+    s.style.color = color;
 
-  const s = document.createElement("div");
-  s.className = "cardSparkle";
-  s.style.color = color;
+    let x, y, dx, dy;
 
-    let x, y;
-
-    // randomly choose an edge
     const side = Math.floor(Math.random() * 4);
 
     switch(side){
 
-      // top edge
+      // TOP
       case 0:
         x = rect.left + Math.random() * rect.width;
-        y = rect.top - 8;
+        y = rect.top - 18;
+
+        dx = (Math.random() - 0.5) * 30;
+        dy = -20 - Math.random() * 35;
         break;
 
-      // right edge
+      // RIGHT
       case 1:
-        x = rect.right + 8;
+        x = rect.right + 18;
         y = rect.top + Math.random() * rect.height;
+
+        dx = 20 + Math.random() * 35;
+        dy = (Math.random() - 0.5) * 30;
         break;
 
-      // bottom edge
+      // BOTTOM
       case 2:
         x = rect.left + Math.random() * rect.width;
-        y = rect.bottom + 8;
+        y = rect.bottom + 18;
+
+        dx = (Math.random() - 0.5) * 30;
+        dy = 20 + Math.random() * 35;
         break;
 
-      // left edge
+      // LEFT
       case 3:
-        x = rect.left - 8;
+        x = rect.left - 18;
         y = rect.top + Math.random() * rect.height;
+
+        dx = -20 - Math.random() * 35;
+        dy = (Math.random() - 0.5) * 30;
         break;
     }
 
     s.style.left = x + "px";
     s.style.top = y + "px";
 
+    s.style.setProperty("--dx", dx + "px");
+    s.style.setProperty("--dy", dy + "px");
+
     holder.appendChild(s);
 
-    setTimeout(() => s.remove(), 1500);
+    setTimeout(() => s.remove(), 1800);
   }
 }
 
@@ -886,8 +925,16 @@ window.showCard = function(name){
   }
 
   const r = rarity(v.odds);
-  if(r !== "common"){
-  spawnCardSparkles(r);
+  const colors = {
+    rare: "#4da6ff",
+    epic: "#b84dff",
+    legendary: "#ffd700",
+    mythic: "#ff3030"
+  };
+  
+  if(r !== "common" && colors[r]){
+    spawnCardSparkles(colors[r]);
+  }
 }
 
   // show visually
