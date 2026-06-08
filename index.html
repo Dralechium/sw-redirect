@@ -587,8 +587,9 @@ function spawnCardSparklesOn(el, rarityType){
       s.style.top = (y + jitterY) + "px";
 
       const offset = isTopRight
-      ? (isBig ? 6 : 0)
-      : (isBig ? 0 : 6);
+        ? (isBig ? sparkleGap / 2 : -sparkleGap / 2)
+        : (isBig ? -sparkleGap / 2 : sparkleGap / 2);
+      
       const dx = (corner.x === 0 ? -1 : 1) * offset;
       const dy = (corner.y === 0 ? -1 : 1) * offset;
 
@@ -601,6 +602,8 @@ function spawnCardSparklesOn(el, rarityType){
     }
   }
 }
+
+const sparkleGap = 12; // 👈 change this to increase/decrease spacing
 
 /* VIEWERS */
 const viewers = [
