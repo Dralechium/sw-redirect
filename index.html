@@ -532,31 +532,57 @@ function spawnCardSparklesOn(el, rarityType){
 
   for (const corner of corners) {
 
-    for (let i = 0; i < 2; i++) {
+  const isBottomLeft = (corner.x === 0 && corner.y === rect.height);
 
-      const s = document.createElement("div");
-      s.className = "cardSparkle";
-      s.style.color = color;
+  for (let i = 0; i < 2; i++) {
 
-      const size = (i === 0) ? 56 : 32;
-      s.style.width = size + "px";
-      s.style.height = size + "px";
+    const s = document.createElement("div");
+    s.className = "cardSparkle";
+    s.style.color = color;
 
-      const jitterX = (i === 0 ? -2 : 3);
-      const jitterY = (i === 0 ? 3 : -2);
+    // BIG sparkle = front, SMALL = back
+    const isBig = (i === 0);
 
-      s.style.left = (corner.x + jitterX) + "px";
-      s.style.top = (corner.y + jitterY) + "px";
+    const size = isBig ? 56 : 32;
+    s.style.width = size + "px";
+    s.style.height = size + "px";
 
-      const offset = (i === 0 ? 0 : 6);
-      const dx = (corner.x === 0 ? -1 : 1) * offset;
-      const dy = (corner.y === 0 ? -1 : 1) * offset;
+    let x = corner.x;
+    let y = corner.y;
 
-      s.style.setProperty("--dx", dx + "px");
-      s.style.setProperty("--dy", dy + "px");
+    // default small jitter
+    let jitterX = isBig ? -2 : 3;
+    let jitterY = isBig ? 3 : -2;
 
-      el.appendChild(s);
+    // 👉 SPECIAL RULE: bottom-left flip layering
+    if (isBottomLeft) {
+
+      if (isBig) {
+        // BIG sparkle sits directly on edge
+        jitterX = 0;
+        jitterY = 0;
+      } else {
+        // SMALL sparkle sits behind (inward offset)
+        jitterX = 10;
+        jitterY = -10;
+      }
     }
+
+    s.style.left = (x + jitterX) + "px";
+    s.style.top = (y + jitterY) + "px";
+
+    const offset = isBig ? 0 : 6;
+
+    const dx = (corner.x === 0 ? -1 : 1) * offset;
+    const dy = (corner.y === 0 ? -1 : 1) * offset;
+
+    s.style.setProperty("--dx", dx + "px");
+    s.style.setProperty("--dy", dy + "px");
+
+    // layering control (IMPORTANT)
+    s.style.zIndex = isBig ? 2 : 1;
+
+    display.appendChild(s);
   }
 }
 
