@@ -523,26 +523,35 @@ function spawnCardSparkles(rarityType){
     const pad = 4;
     const jitter = 14;
 
-    const side = Math.floor(Math.random() * 4);
+/* 🔥 STRICT EDGE ONLY (NO INWARD SPAWN) */
 
-    let x, y;
+const side = Math.floor(Math.random() * 4);
 
-    if(side === 0){
-      x = Math.random() * rect.width;
-      y = pad + (Math.random() * jitter - jitter / 2);
-    }
-    else if(side === 1){
-      x = rect.width - pad + (Math.random() * jitter - jitter / 2);
-      y = Math.random() * rect.height;
-    }
-    else if(side === 2){
-      x = Math.random() * rect.width;
-      y = rect.height - pad + (Math.random() * jitter - jitter / 2);
-    }
-    else{
-      x = pad + (Math.random() * jitter - jitter / 2);
-      y = Math.random() * rect.height;
-    }
+let x, y;
+
+if (side === 0) {
+  // TOP EDGE (exactly on top border)
+  x = Math.random() * rect.width;
+  y = 0;
+}
+
+else if (side === 1) {
+  // RIGHT EDGE
+  x = rect.width;
+  y = Math.random() * rect.height;
+}
+
+else if (side === 2) {
+  // BOTTOM EDGE
+  x = Math.random() * rect.width;
+  y = rect.height;
+}
+
+else {
+  // LEFT EDGE
+  x = 0;
+  y = Math.random() * rect.height;
+}
 
     s.style.left = x + "px";
     s.style.top = y + "px";
