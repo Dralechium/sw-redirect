@@ -484,80 +484,57 @@ function moveBlob(btn){
   blob.style.left = left + "px";
 }
 
-function spawnCardSparkles(rarityType){
+function spawnCardSparkles(color){
 
-  const display = document.getElementById("display");
-  const rect = display.getBoundingClientRect();
+  const holder = document.getElementById("sparkles");
+  const card = document.getElementById("display");
 
-  const colors = {
-    rare: "#4da6ff",
-    epic: "#b84dff",
-    legendary: "#ffd700",
-    mythic: "#ff3030"
-  };
+  const rect = card.getBoundingClientRect();
 
-  const amounts = {
-    rare: 10,
-    epic: 15,
-    legendary: 22,
-    mythic: 30
-  };
-
-  const color = colors[rarityType];
-  const amount = amounts[rarityType];
-
-  if(!color) return;
-
-  for(let i=0;i<amount;i++){
+  for(let i = 0; i < 40; i++){
 
     const s = document.createElement("div");
-    s.className = "cardSparkle";
-    s.style.color = color;
+    s.className = "sparkle";
+    s.style.background = color;
 
-    const size = 8 + Math.random() * 14;
+    let x, y;
 
-    s.style.width = size + "px";
-    s.style.height = size + "px";
+    // randomly choose an edge
+    const side = Math.floor(Math.random() * 4);
 
-    const side = Math.floor(Math.random()*4);
+    switch(side){
 
-    let x,y;
+      // top edge
+      case 0:
+        x = rect.left + Math.random() * rect.width;
+        y = rect.top - 8;
+        break;
 
-    const margin = 18;
-    
-    if(side === 0){ // top
-      x = Math.random() * rect.width;
-      y = -margin;
+      // right edge
+      case 1:
+        x = rect.right + 8;
+        y = rect.top + Math.random() * rect.height;
+        break;
+
+      // bottom edge
+      case 2:
+        x = rect.left + Math.random() * rect.width;
+        y = rect.bottom + 8;
+        break;
+
+      // left edge
+      case 3:
+        x = rect.left - 8;
+        y = rect.top + Math.random() * rect.height;
+        break;
     }
-    else if(side === 1){ // right
-      x = rect.width + margin;
-      y = Math.random() * rect.height;
-    }
-    else if(side === 2){ // bottom
-      x = Math.random() * rect.width;
-      y = rect.height + margin;
-    }
-    else{ // left
-      x = -margin;
-      y = Math.random() * rect.height;
-    }
 
-    s.style.left = x+"px";
-    s.style.top = y+"px";
+    s.style.left = x + "px";
+    s.style.top = y + "px";
 
-    s.style.setProperty(
-      "--dx",
-      `${(Math.random()-0.5)*50}px`
-    );
+    holder.appendChild(s);
 
-    s.style.setProperty(
-      "--dy",
-      `${-40-Math.random()*80}px`
-    );
-
-    display.appendChild(s);
-
-    setTimeout(()=>s.remove(),1800);
+    setTimeout(() => s.remove(), 1500);
   }
 }
 
@@ -689,7 +666,18 @@ function show(v){
 
   // re-apply correct rarity class
   const r = rarity(v.odds);
+  
   display.classList.add(r);
+    const colors = {
+    rare: "#4da6ff",
+    epic: "#b84dff",
+    legendary: "#ffd700",
+    mythic: "#ff3030"
+  };
+  
+  if(colors[r]){
+    spawnCardSparkles(colors[r]);
+  }
 }
 
 /* FINISH */
