@@ -671,26 +671,23 @@ function roll(){
   }
 
   function frame(t){
-    let p = (t - start) / rollDuration;
-    if(p > 1) p = 1;
+  let p = (t - start) / rollDuration;
+  if(p > 1) p = 1;
 
-    let delay = 35 + (220 * p);
+  if(p < 1){
+    let v = visualPick();
+    show(v);
 
-    if(p < 1){
-      let v = visualPick();
-      show(v);
+    setTimeout(() => {
+      requestAnimationFrame(frame);
+    }, 35 + (220 * p));
 
-      setTimeout(() => requestAnimationFrame(frame), delay);
-
-    } else {
-      let final = weightedPick();
-      show(final);
-      finish(final);
-      running = false;
-    }
+  } else {
+    let final = weightedPick();
+    show(final);
+    finish(final);
+    running = false;
   }
-
-  requestAnimationFrame(frame);
 }
 
 /* SHOW */
@@ -716,13 +713,22 @@ function finish(v){
   inventory[v.name] = (inventory[v.name] || 0) + 1;
 
   const r = rarity(v.odds);
-  
-  if(colors[r]){
+
+  const colors = {
+    rare: "#4da6ff",
+    epic: "#b84dff",
+    legendary: "#ffd700",
+    mythic: "#ff3030"
+  };
+
+  // sparkles
+  if(r !== "common" && colors[r]){
     spawnCardSparkles(colors[r]);
   }
 
+  // best tracking
   if(!best || v.odds > best.odds){
-    best = { name:v.name, odds:v.odds };
+    best = { name: v.name, odds: v.odds };
 
     const bestText = document.getElementById("best");
     bestText.innerText = `${best.name} (1/${best.odds})`;
@@ -731,13 +737,6 @@ function finish(v){
     bestText.classList.add("best-" + rarity(best.odds));
   }
 
-    const colors = {
-    rare: "#4da6ff",
-    epic: "#b84dff",
-    legendary: "#ffd700",
-    mythic: "#ff3030"
-  };
-  
   save();
   render();
 }
