@@ -238,6 +238,7 @@ html, body {
   margin:15px auto 18px auto;
   padding:20px;
   border-radius:15px;
+  overflow:visible;
   background:#181818;
   transition: opacity 0.2s ease;
 }
@@ -522,21 +523,23 @@ function spawnCardSparkles(rarityType){
 
     let x,y;
 
-    if(side===0){ // top
-      x = Math.random()*rect.width;
-      y = -5;
+    const margin = 18;
+    
+    if(side === 0){ // top
+      x = Math.random() * rect.width;
+      y = -margin;
     }
-    else if(side===1){ // right
-      x = rect.width+5;
-      y = Math.random()*rect.height;
+    else if(side === 1){ // right
+      x = rect.width + margin;
+      y = Math.random() * rect.height;
     }
-    else if(side===2){ // bottom
-      x = Math.random()*rect.width;
-      y = rect.height+5;
+    else if(side === 2){ // bottom
+      x = Math.random() * rect.width;
+      y = rect.height + margin;
     }
     else{ // left
-      x = -5;
-      y = Math.random()*rect.height;
+      x = -margin;
+      y = Math.random() * rect.height;
     }
 
     s.style.left = x+"px";
@@ -695,6 +698,10 @@ function finish(v){
   inventory[v.name] = (inventory[v.name] || 0) + 1;
 
   const r = rarity(v.odds);
+
+  if(r !== "common"){
+    spawnCardSparkles(r);
+  }
 
   if(r === "legendary" || r === "mythic"){
     playCutscene(r);
