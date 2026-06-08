@@ -716,13 +716,6 @@ function finish(v){
   inventory[v.name] = (inventory[v.name] || 0) + 1;
 
   const r = rarity(v.odds);
-
-    const colors = {
-    rare: "#4da6ff",
-    epic: "#b84dff",
-    legendary: "#ffd700",
-    mythic: "#ff3030"
-  };
   
   if(colors[r]){
     spawnCardSparkles(colors[r]);
