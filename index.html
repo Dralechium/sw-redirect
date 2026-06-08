@@ -508,14 +508,19 @@ function spawnCardSparkles(rarityType){
 
   const rect = display.getBoundingClientRect();
 
-  // FIXED CORNERS (NO randomness, correct geometry)
   const corners = [
-    // TOP LEFT
-    { x: 0, y: 0, biggerIndex: 0 },
+  // top-left
+  { x: 0, y: 0 },
 
-    // BOTTOM RIGHT
-    { x: rect.width, y: rect.height, biggerIndex: 1 }
-  ];
+  // top-right
+  { x: rect.width, y: 0 },
+
+  // bottom-left
+  { x: 0, y: rect.height },
+
+  // bottom-right
+  { x: rect.width, y: rect.height }
+];
 
   for (const corner of corners) {
 
@@ -535,9 +540,11 @@ function spawnCardSparkles(rarityType){
       s.style.width = size + "px";
       s.style.height = size + "px";
 
-      // ONLY tiny float (no position randomness anymore)
-      const dx = (i === 0 ? -6 : 6);
-      const dy = (i === 0 ? -6 : 6);
+       // mirror direction based on which corner we're in
+      const isTopLeft = (corner.x === 0 && corner.y === 0);
+      
+      const dx = isTopLeft ? -6 : 6;
+      const dy = isTopLeft ? -6 : 6;
 
       s.style.setProperty("--dx", dx + "px");
       s.style.setProperty("--dy", dy + "px");
