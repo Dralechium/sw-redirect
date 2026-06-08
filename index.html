@@ -489,6 +489,9 @@ function spawnCardSparkles(rarityType){
 
   const display = document.getElementById("display");
   const rect = display.getBoundingClientRect();
+  const cs = getComputedStyle(display);
+  const padX = parseFloat(cs.paddingLeft);
+  const padY = parseFloat(cs.paddingTop);
 
   const colors = {
     rare: "#4da6ff",
@@ -531,27 +534,33 @@ let x, y;
 
 const half = size / 2;
 
+x -= padX;
+y -= padY;
+
+s.style.left = x + "px";
+s.style.top = y + "px";
+  
 if (side === 0) {
   // TOP
   x = Math.random() * rect.width;
-  y = -half;
+  y = 0;
 }
 
 else if (side === 1) {
   // RIGHT
-  x = rect.width + half;
+  x = rect.width;
   y = Math.random() * rect.height;
 }
 
 else if (side === 2) {
   // BOTTOM
   x = Math.random() * rect.width;
-  y = rect.height + half;
+  y = rect.height;
 }
 
 else {
   // LEFT
-  x = -half;
+  x = 0;
   y = Math.random() * rect.height;
 }
 
