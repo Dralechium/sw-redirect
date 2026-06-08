@@ -508,43 +508,40 @@ function spawnCardSparkles(rarityType){
 
   const rect = display.getBoundingClientRect();
 
+  // ONLY TWO CORNERS (as requested)
   const corners = [
-  // top-left
-  { x: 0, y: 0 },
+    // bottom-left
+    { x: 0, y: rect.height },
 
-  // top-right
-  { x: rect.width, y: 0 },
-
-  // bottom-left
-  { x: 0, y: rect.height },
-
-  // bottom-right
-  { x: rect.width, y: rect.height }
-];
+    // top-right
+    { x: rect.width, y: 0 }
+  ];
 
   for (const corner of corners) {
 
+    // 2 sparkles per corner
     for (let i = 0; i < 2; i++) {
 
       const s = document.createElement("div");
       s.className = "cardSparkle";
       s.style.color = color;
 
-      // anchor directly on corner
+      // anchor EXACTLY on edge
       s.style.left = corner.x + "px";
       s.style.top = corner.y + "px";
 
-      // size rules (1.5x version already)
-      let size = (i === corner.biggerIndex) ? 27 : 16;
-
+      // one big, one small
+      const size = (i === 0) ? 28 : 16;
       s.style.width = size + "px";
       s.style.height = size + "px";
 
-       // mirror direction based on which corner we're in
-      const isTopLeft = (corner.x === 0 && corner.y === 0);
-      
-      const dx = isTopLeft ? -6 : 6;
-      const dy = isTopLeft ? -6 : 6;
+      // tiny offset so they don’t overlap perfectly
+      const offset = (i === 0) ? 0 : 6;
+
+      // bottom-left pushes outward slightly down-left
+      // top-right pushes outward slightly up-right
+      const dx = (corner.x === 0 ? -1 : 1) * offset;
+      const dy = (corner.y === 0 ? -1 : 1) * offset;
 
       s.style.setProperty("--dx", dx + "px");
       s.style.setProperty("--dy", dy + "px");
