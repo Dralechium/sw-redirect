@@ -550,10 +550,41 @@ function spawnCardSparklesOn(el, rarityType){
     let x = corner.x;
     let y = corner.y;
 
-    // default small jitter
-    let jitterX = isBig ? -2 : 3;
-    let jitterY = isBig ? 3 : -2;
+    let jitterX, jitterY;
 
+// DEFAULT behavior (other corners)
+if (!isBottomLeft && !isTopRight) {
+  jitterX = isBig ? -2 : 3;
+  jitterY = isBig ? 3 : -2;
+}
+
+  // bottom-left special (keep your existing logic)
+  else if (isBottomLeft) {
+    if (isBig) {
+      jitterX = 0;
+      jitterY = 0;
+    } else {
+      jitterX = 10;
+      jitterY = -10;
+    }
+  }
+  
+  // 🔥 TOP-RIGHT: swap big/small spacing
+  else if (isTopRight) {
+    if (isBig) {
+      // BIG moves slightly inward (was small behavior)
+      jitterX = -10;
+      jitterY = 10;
+    } else {
+      // SMALL sits closer to edge (was big behavior)
+      jitterX = 0;
+      jitterY = 0;
+    }
+  }
+
+    const isBottomLeft = (corner.x === 0 && corner.y === rect.height);
+    const isTopRight = (corner.x === rect.width && corner.y === 0);
+    
     // 👉 SPECIAL RULE: bottom-left flip layering
     if (isBottomLeft) {
 
