@@ -258,13 +258,6 @@ html, body {
 
 #odds{ color:#aaa; }
 
-#sparkles{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:10000;
-}
-
 .rollBtn{
   padding:18px 70px;
   font-size:20px;
@@ -322,44 +315,27 @@ html, body {
 
 .cardSparkle{
   position:absolute;
-  width:14px;
-  height:14px;
-  transform:rotate(45deg);
   pointer-events:none;
+
+  width:12px;
+  height:12px;
 
   animation:sparkleFloat 1.8s ease-out forwards;
 }
 
-.cardSparkle::before,
-.cardSparkle::after{
+.cardSparkle::before{
   content:"";
-  position:absolute;
 
-  left:50%;
-  top:50%;
+  position:absolute;
+  inset:0;
 
   background:currentColor;
 
-  transform:translate(-50%, -50%);
-  border-radius:999px;
-}
-
-.cardSparkle::before{
-  width:2px;
-  height:100%;
+  transform:rotate(45deg);
 
   box-shadow:
-    0 0 6px currentColor,
-    0 0 12px currentColor;
-}
-
-.cardSparkle::after{
-  width:100%;
-  height:2px;
-
-  box-shadow:
-    0 0 6px currentColor,
-    0 0 12px currentColor;
+    0 0 8px currentColor,
+    0 0 16px currentColor;
 }
 
 /* rarity glow + color themes */
@@ -508,73 +484,80 @@ function moveBlob(btn){
   blob.style.left = left + "px";
 }
 
-function spawnCardSparkles(color){
+function spawnCardSparkles(rarityType){
 
-  const holder = document.getElementById("sparkles");
-  const card = document.getElementById("display");
+  const display = document.getElementById("display");
+  const rect = display.getBoundingClientRect();
 
-  if(!holder || !card) return;
+  const colors = {
+    rare: "#4da6ff",
+    epic: "#b84dff",
+    legendary: "#ffd700",
+    mythic: "#ff3030"
+  };
 
-  const rect = card.getBoundingClientRect();
+  const amounts = {
+    rare: 10,
+    epic: 15,
+    legendary: 22,
+    mythic: 30
+  };
 
-  for(let i = 0; i < 30; i++){
+  const color = colors[rarityType];
+  const amount = amounts[rarityType];
+
+  if(!color) return;
+
+  for(let i=0;i<amount;i++){
 
     const s = document.createElement("div");
     s.className = "cardSparkle";
     s.style.color = color;
 
-    let x, y, dx, dy;
+    const size = 8 + Math.random() * 14;
 
-    const side = Math.floor(Math.random() * 4);
+    s.style.width = size + "px";
+    s.style.height = size + "px";
 
-    switch(side){
+    const side = Math.floor(Math.random()*4);
 
-      // TOP
-      case 0:
-        x = rect.left + Math.random() * rect.width;
-        y = rect.top - 18;
+    let x,y;
 
-        dx = (Math.random() - 0.5) * 30;
-        dy = -20 - Math.random() * 35;
-        break;
-
-      // RIGHT
-      case 1:
-        x = rect.right + 18;
-        y = rect.top + Math.random() * rect.height;
-
-        dx = 20 + Math.random() * 35;
-        dy = (Math.random() - 0.5) * 30;
-        break;
-
-      // BOTTOM
-      case 2:
-        x = rect.left + Math.random() * rect.width;
-        y = rect.bottom + 18;
-
-        dx = (Math.random() - 0.5) * 30;
-        dy = 20 + Math.random() * 35;
-        break;
-
-      // LEFT
-      case 3:
-        x = rect.left - 18;
-        y = rect.top + Math.random() * rect.height;
-
-        dx = -20 - Math.random() * 35;
-        dy = (Math.random() - 0.5) * 30;
-        break;
+    const margin = 18;
+    
+    if(side === 0){ // top
+      x = Math.random() * rect.width;
+      y = -margin;
+    }
+    else if(side === 1){ // right
+      x = rect.width + margin;
+      y = Math.random() * rect.height;
+    }
+    else if(side === 2){ // bottom
+      x = Math.random() * rect.width;
+      y = rect.height + margin;
+    }
+    else{ // left
+      x = -margin;
+      y = Math.random() * rect.height;
     }
 
-    s.style.left = x + "px";
-    s.style.top = y + "px";
+    s.style.left = x+"px";
+    s.style.top = y+"px";
 
-    s.style.setProperty("--dx", dx + "px");
-    s.style.setProperty("--dy", dy + "px");
+    s.style.setProperty(
+      "--dx",
+      `${(Math.random()-0.5)*50}px`
+    );
 
-    holder.appendChild(s);
+    s.style.setProperty(
+      "--dy",
+      `${-40-Math.random()*80}px`
+    );
 
-    setTimeout(() => s.remove(), 1800);
+    display.appendChild(s);
+
+    setTimeout(()=>s.remove(),1800);
   }
 }
 
@@ -671,23 +654,26 @@ function roll(){
   }
 
   function frame(t){
-  let p = (t - start) / rollDuration;
-  if(p > 1) p = 1;
+    let p = (t - start) / rollDuration;
+    if(p > 1) p = 1;
 
-  if(p < 1){
-    let v = visualPick();
-    show(v);
+    let delay = 35 + (220 * p);
 
-    setTimeout(() => {
-      requestAnimationFrame(frame);
-    }, 35 + (220 * p));
+    if(p < 1){
+      let v = visualPick();
+      show(v);
 
-  } else {
-    let final = weightedPick();
-    show(final);
-    finish(final);
-    running = false;
+      setTimeout(() => requestAnimationFrame(frame), delay);
+
+    } else {
+      let final = weightedPick();
+      show(final);
+      finish(final);
+      running = false;
+    }
   }
+
+  requestAnimationFrame(frame);
 }
 
 /* SHOW */
@@ -703,7 +689,6 @@ function show(v){
 
   // re-apply correct rarity class
   const r = rarity(v.odds);
-  
   display.classList.add(r);
 }
 
@@ -714,21 +699,16 @@ function finish(v){
 
   const r = rarity(v.odds);
 
-  const colors = {
-    rare: "#4da6ff",
-    epic: "#b84dff",
-    legendary: "#ffd700",
-    mythic: "#ff3030"
-  };
-
-  // sparkles
-  if(r !== "common" && colors[r]){
-    spawnCardSparkles(colors[r]);
+  if(r !== "common"){
+    spawnCardSparkles(r);
   }
 
-  // best tracking
+  if(r === "legendary" || r === "mythic"){
+    playCutscene(r);
+  }
+
   if(!best || v.odds > best.odds){
-    best = { name: v.name, odds: v.odds };
+    best = { name:v.name, odds:v.odds };
 
     const bestText = document.getElementById("best");
     bestText.innerText = `${best.name} (1/${best.odds})`;
@@ -924,33 +904,26 @@ window.showCard = function(name){
   }
 
   const r = rarity(v.odds);
-
-  const colors = {
-    rare: "#4da6ff",
-    epic: "#b84dff",
-    legendary: "#ffd700",
-    mythic: "#ff3030"
-  };
-
-  if(r !== "common" && colors[r]){
-    spawnCardSparkles(colors[r]);
-  }
+  if(r !== "common"){
+  spawnCardSparkles(r);
+}
 
   // show visually
   show(v);
 
+  // optional: reset animation feel
   const display = document.getElementById("display");
   display.style.opacity = 1;
 
-  // cutscene trigger
+  // CUTSCENE TRIGGER (only for high rarity like your roll system)
   if(r === "legendary" || r === "mythic"){
     playCutscene(r);
   }
 };
 
 </script>
-<div id="sparkles"></div>
 <div id="cutsceneOverlay"></div>
 <div id="redLight"></div>
+</div>
 </body>
 </html>
