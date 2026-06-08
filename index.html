@@ -528,8 +528,6 @@ const sparklePairs = [
   }
 ];
 
-s.style.transform = "translate(-50%, -50%)";
-
   for (const corner of sparklePairs) {
 
     for (let i = 0; i < 2; i++) {
@@ -537,6 +535,7 @@ s.style.transform = "translate(-50%, -50%)";
       const s = document.createElement("div");
       s.className = "cardSparkle";
       s.style.color = color;
+      s.style.transform = "translate(-50%, -50%)";
 
       // FIXED positioning (no randomness anymore)
       let x = corner.x + corner.offsetX;
@@ -687,7 +686,9 @@ function roll(){
       let final = weightedPick();
       show(final);
       finish(final);
-      running = false;
+      setTimeout(() => {
+        running = false;
+      }, 50);
     }
   }
 
