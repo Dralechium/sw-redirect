@@ -582,7 +582,7 @@ function spawnCardSparklesOn(el, rarityType){
     // layering control (IMPORTANT)
     s.style.zIndex = isBig ? 2 : 1;
 
-    display.appendChild(s);
+    el.appendChild(s);
   }
 }
 
@@ -688,7 +688,9 @@ function roll(){
       let v = visualPick();
       show(v);
 
-      setTimeout(() => requestAnimationFrame(frame), delay);
+      setTimeout(() => {
+        requestAnimationFrame(frame);
+      }, delay);
 
     } else {
       let final = weightedPick();
@@ -727,6 +729,7 @@ function finish(v){
   const r = rarity(v.odds);
 
   if(r !== "common"){
+    const display = document.getElementById("display");
     spawnCardSparklesOn(display, r);
   }
 
