@@ -509,10 +509,10 @@ function moveBlob(btn){
   blob.style.left = left + "px";
 }
 
-function spawnCardSparkles(rarityType){
+function spawnCardSparklesOn(el, rarityType){
 
-  const display = document.getElementById("display");
-
+  el.querySelectorAll(".cardSparkle").forEach(e => e.remove());
+  
   const colors = {
     rare: "#4da6ff",
     epic: "#b84dff",
@@ -523,11 +523,11 @@ function spawnCardSparkles(rarityType){
   const color = colors[rarityType];
   if(!color) return;
 
-  const rect = display.getBoundingClientRect();
+  const rect = el.getBoundingClientRect();
 
   const corners = [
-    { x: 0, y: rect.height }, // bottom-left
-    { x: rect.width, y: 0 }   // top-right
+    { x: 0, y: rect.height },
+    { x: rect.width, y: 0 }
   ];
 
   for (const corner of corners) {
@@ -538,28 +538,24 @@ function spawnCardSparkles(rarityType){
       s.className = "cardSparkle";
       s.style.color = color;
 
-      // size (big + small)
       const size = (i === 0) ? 28 : 16;
       s.style.width = size + "px";
       s.style.height = size + "px";
 
-      // jitter
       const jitterX = (i === 0 ? -2 : 3);
       const jitterY = (i === 0 ? 3 : -2);
 
       s.style.left = (corner.x + jitterX) + "px";
       s.style.top = (corner.y + jitterY) + "px";
 
-      // motion
-      const offset = (i === 0) ? 0 : 6;
-
+      const offset = (i === 0 ? 0 : 6);
       const dx = (corner.x === 0 ? -1 : 1) * offset;
       const dy = (corner.y === 0 ? -1 : 1) * offset;
 
       s.style.setProperty("--dx", dx + "px");
       s.style.setProperty("--dy", dy + "px");
 
-      display.appendChild(s);
+      el.appendChild(s);
     }
   }
 }
@@ -705,7 +701,7 @@ function finish(v){
   const r = rarity(v.odds);
 
   if(r !== "common"){
-    spawnCardSparkles(r);
+    spawnCardSparklesOn(display, r);
   }
 
   if(r === "legendary" || r === "mythic"){
@@ -902,25 +898,27 @@ window.playCutscene = function(type){
 };
 
 window.showCard = function(name){
-  const v = viewers.find(x => x.name.toLowerCase() === name.toLowerCase());
+
+  const v = viewers.find(x =>
+    x.name.trim().toLowerCase() === name.trim().toLowerCase()
+  );
+
   if(!v){
     console.log("Card not found:", name);
     return;
   }
 
   const r = rarity(v.odds);
-  if(r !== "common"){
-  spawnCardSparkles(r);
-}
 
-  // show visually
   show(v);
 
-  // optional: reset animation feel
   const display = document.getElementById("display");
   display.style.opacity = 1;
 
-  // CUTSCENE TRIGGER (only for high rarity like your roll system)
+  if(r !== "common"){
+    spawnCardSparklesOn(display, r);
+  }
+
   if(r === "legendary" || r === "mythic"){
     playCutscene(r);
   }
