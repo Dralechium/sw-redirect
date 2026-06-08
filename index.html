@@ -508,21 +508,27 @@ function spawnCardSparkles(rarityType){
   const color = colors[rarityType];
   if(!color) return;
 
-  const sparklePairs = [
-    // TOP RIGHT (fixed)
-    {
-      baseX: rect.width - 10,
-      baseY: 10,
-      biggerIndex: 0 // upper sparkle is bigger
-    },
+const sparklePairs = [
+  // TOP RIGHT
+  {
+    x: rect.width,
+    y: 0,
+    offsetX: -14,
+    offsetY: 14,
+    biggerIndex: 0
+  },
 
-    // BOTTOM LEFT (fixed)
-    {
-      baseX: 10,
-      baseY: rect.height - 10,
-      biggerIndex: 1 // lower sparkle is bigger
-    }
-  ];
+  // BOTTOM LEFT
+  {
+    x: 0,
+    y: rect.height,
+    offsetX: 14,
+    offsetY: -14,
+    biggerIndex: 1
+  }
+];
+
+s.style.transform = "translate(-50%, -50%)";
 
   for (const corner of sparklePairs) {
 
@@ -533,8 +539,8 @@ function spawnCardSparkles(rarityType){
       s.style.color = color;
 
       // FIXED positioning (no randomness anymore)
-      let x = corner.baseX;
-      let y = corner.baseY;
+      let x = corner.x + corner.offsetX;
+      let y = corner.y + corner.offsetY;
 
       // slight separation so they don’t overlap perfectly
       const spread = 8;
@@ -551,9 +557,9 @@ function spawnCardSparkles(rarityType){
       let size = 10;
 
       if (i === corner.biggerIndex) {
-        size = 18; // main sparkle
+        size = 27; // 18 × 1.5
       } else {
-        size = 11; // secondary sparkle
+        size = 16; // 11 × 1.5
       }
 
       s.style.width = size + "px";
