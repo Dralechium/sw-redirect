@@ -318,9 +318,8 @@ html, body {
   position:absolute;
   pointer-events:none;
   filter: drop-shadow(0 0 6px currentColor);
-  width:12px;
-  height:12px;
 
+  transform: translate(-50%, -50%);
   animation:sparkleFloat 1.8s ease-out forwards;
 }
 
@@ -496,7 +495,6 @@ function moveBlob(btn){
 function spawnCardSparkles(rarityType){
 
   const display = document.getElementById("display");
-  const rect = display.getBoundingClientRect();
 
   const colors = {
     rare: "#4da6ff",
@@ -508,65 +506,38 @@ function spawnCardSparkles(rarityType){
   const color = colors[rarityType];
   if(!color) return;
 
-const sparklePairs = [
-  // TOP RIGHT
-  {
-    x: rect.width,
-    y: 0,
-    offsetX: -14,
-    offsetY: 14,
-    biggerIndex: 0
-  },
+  const rect = display.getBoundingClientRect();
 
-  // BOTTOM LEFT
-  {
-    x: 0,
-    y: rect.height,
-    offsetX: 14,
-    offsetY: -14,
-    biggerIndex: 1
-  }
-];
+  // FIXED CORNERS (NO randomness, correct geometry)
+  const corners = [
+    // TOP LEFT
+    { x: 0, y: 0, biggerIndex: 0 },
 
-  for (const corner of sparklePairs) {
+    // BOTTOM RIGHT
+    { x: rect.width, y: rect.height, biggerIndex: 1 }
+  ];
+
+  for (const corner of corners) {
 
     for (let i = 0; i < 2; i++) {
 
       const s = document.createElement("div");
       s.className = "cardSparkle";
       s.style.color = color;
-      s.style.transform = "translate(-50%, -50%)";
 
-      // FIXED positioning (no randomness anymore)
-      let x = corner.x + corner.offsetX;
-      let y = corner.y + corner.offsetY;
+      // anchor directly on corner
+      s.style.left = corner.x + "px";
+      s.style.top = corner.y + "px";
 
-      // slight separation so they don’t overlap perfectly
-      const spread = 8;
-
-      if (i === 0) y -= spread; // upper sparkle
-      if (i === 1) y += spread; // lower sparkle
-
-      s.style.left = x + "px";
-      s.style.top = y + "px";
-
-      // SIZE RULES:
-      // top-right: upper bigger
-      // bottom-left: lower bigger
-      let size = 10;
-
-      if (i === corner.biggerIndex) {
-        size = 27; // 18 × 1.5
-      } else {
-        size = 16; // 11 × 1.5
-      }
+      // size rules (1.5x version already)
+      let size = (i === corner.biggerIndex) ? 27 : 16;
 
       s.style.width = size + "px";
       s.style.height = size + "px";
 
-      // subtle float ONLY (no position randomness)
-      const dx = (Math.random() - 0.5) * 10;
-      const dy = (Math.random() - 0.5) * 10;
+      // ONLY tiny float (no position randomness anymore)
+      const dx = (i === 0 ? -6 : 6);
+      const dy = (i === 0 ? -6 : 6);
 
       s.style.setProperty("--dx", dx + "px");
       s.style.setProperty("--dy", dy + "px");
