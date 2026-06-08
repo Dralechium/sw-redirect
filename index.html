@@ -536,38 +536,35 @@ function spawnCardSparkles(rarityType){
 
   for (const corner of corners) {
 
-    // 2 sparkles per corner
-    for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < 2; i++) {
 
-      const s = document.createElement("div");
-      s.className = "cardSparkle";
-      s.style.color = color;
+    const s = document.createElement("div");
+    s.className = "cardSparkle";
+    s.style.color = color;
 
-      // anchor EXACTLY on edge
-      s.style.left = (corner.x + jitterX) + "px";
-      s.style.top = (corner.y + jitterY) + "px";
+    // size first
+    const size = (i === 0) ? 28 : 16;
+    s.style.width = size + "px";
+    s.style.height = size + "px";
 
-      // one big, one small
-      const size = (i === 0) ? 28 : 16;
-      const jitterX = (i === 0 ? -2 : 3);
-      const jitterY = (i === 0 ? 3 : -2);
-      s.style.width = size + "px";
-      s.style.height = size + "px";
+    // define jitter BEFORE using it
+    const jitterX = (i === 0 ? -2 : 3);
+    const jitterY = (i === 0 ? 3 : -2);
 
-      // tiny offset so they don’t overlap perfectly
-      const offset = (i === 0) ? 0 : 6;
+    // correct placement
+    s.style.left = (corner.x + jitterX) + "px";
+    s.style.top = (corner.y + jitterY) + "px";
 
-      // bottom-left pushes outward slightly down-left
-      // top-right pushes outward slightly up-right
-      const dx = (corner.x === 0 ? -1 : 1) * offset;
-      const dy = (corner.y === 0 ? -1 : 1) * offset;
+    // motion
+    const offset = (i === 0) ? 0 : 6;
 
-      s.style.setProperty("--dx", dx + "px");
-      s.style.setProperty("--dy", dy + "px");
+    const dx = (corner.x === 0 ? -1 : 1) * offset;
+    const dy = (corner.y === 0 ? -1 : 1) * offset;
 
-      display.appendChild(s);
+    s.style.setProperty("--dx", dx + "px");
+    s.style.setProperty("--dy", dy + "px");
 
-    }
+    display.appendChild(s);
   }
 }
 
