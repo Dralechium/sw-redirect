@@ -493,9 +493,10 @@ function spawnCardSparkles(color){
 
   for(let i = 0; i < 40; i++){
 
-    const s = document.createElement("div");
-    s.className = "sparkle";
-    s.style.background = color;
+
+  const s = document.createElement("div");
+  s.className = "cardSparkle";
+  s.style.color = color;
 
     let x, y;
 
@@ -668,16 +669,6 @@ function show(v){
   const r = rarity(v.odds);
   
   display.classList.add(r);
-    const colors = {
-    rare: "#4da6ff",
-    epic: "#b84dff",
-    legendary: "#ffd700",
-    mythic: "#ff3030"
-  };
-  
-  if(colors[r]){
-    spawnCardSparkles(colors[r]);
-  }
 }
 
 /* FINISH */
@@ -687,12 +678,15 @@ function finish(v){
 
   const r = rarity(v.odds);
 
-  if(r !== "common"){
-    spawnCardSparkles(r);
-  }
-
-  if(r === "legendary" || r === "mythic"){
-    playCutscene(r);
+    const colors = {
+    rare: "#4da6ff",
+    epic: "#b84dff",
+    legendary: "#ffd700",
+    mythic: "#ff3030"
+  };
+  
+  if(colors[r]){
+    spawnCardSparkles(colors[r]);
   }
 
   if(!best || v.odds > best.odds){
@@ -910,8 +904,8 @@ window.showCard = function(name){
 };
 
 </script>
+<div id="sparkles"></div>
 <div id="cutsceneOverlay"></div>
 <div id="redLight"></div>
-</div>
 </body>
 </html>
