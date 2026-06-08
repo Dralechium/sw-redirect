@@ -586,7 +586,9 @@ function spawnCardSparklesOn(el, rarityType){
       s.style.left = (x + jitterX) + "px";
       s.style.top = (y + jitterY) + "px";
 
-      const offset = isBig ? 0 : 6;
+      const offset = isTopRight
+      ? (isBig ? 6 : 0)
+      : (isBig ? 0 : 6);
       const dx = (corner.x === 0 ? -1 : 1) * offset;
       const dy = (corner.y === 0 ? -1 : 1) * offset;
 
