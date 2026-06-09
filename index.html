@@ -630,9 +630,9 @@ const defaultViewer = viewers[viewers.length - 1];
 
 /* RARITY */
 function rarity(o){
-  if(o<=5) return "common";
-  if(o<=25) return "rare";
-  if(o<=100) return "epic";
+  if(o<=8) return "common";
+  if(o<=50) return "rare";
+  if(o<=256) return "epic";
   if(o<=1000) return "legendary";
   return "mythic";
 }
