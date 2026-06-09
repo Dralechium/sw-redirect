@@ -780,6 +780,10 @@ function roll(){
       finish(final);
       setTimeout(() => {
         running = false;
+
+        if(autoRoll){
+          roll();
+        }
       }, 50);
     }
   }
@@ -831,15 +835,8 @@ function finish(v){
 
 save();
 render();
-
-if(autoRoll){
-  autoRollTimer = setTimeout(() => {
-    if(!running){
-      roll();
-    }
-  }, 250);
+  
 }
-
 /* INVENTORY */
 function render(){
   let inv = document.getElementById("inventory");
