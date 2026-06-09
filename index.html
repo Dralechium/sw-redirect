@@ -299,6 +299,37 @@ html, body {
   box-shadow:0 0 18px rgba(66,255,41,0.7);
 }
 
+.autoRollBtn{
+  padding:18px 70px;
+  font-size:20px;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+
+  background:#555;
+  color:white;
+
+  font-family:'Orbitron', Arial, sans-serif;
+
+  margin-top:12px;
+
+  box-shadow:0 0 12px rgba(255,255,255,0.15);
+  transition:0.2s ease;
+}
+
+.autoRollBtn:hover{
+  transform:scale(1.05);
+  box-shadow:0 0 18px rgba(255,255,255,0.25);
+}
+
+.autoOn{
+  color:#42ff29;
+}
+
+.autoOff{
+  color:#ff4040;
+}
+
 /* INVENTORY */
 .grid{
   display:grid;
@@ -470,7 +501,9 @@ html, body {
     </div>
 
     <button class="rollBtn" onclick="roll()">ROLL</button>
-
+    <button class="autoRollBtn" onclick="toggleAutoRoll()" id="autoRollBtn">
+      AUTOROLL: <span id="autoRollState" class="autoOff">OFF</span>
+    </button>
   </div>
 
 </div>
@@ -672,6 +705,30 @@ function pick(){
 
 /* ROLL */
 let running=false;
+let autoRoll = false;
+let autoRollTimer = null;
+
+function toggleAutoRoll(){
+
+  autoRoll = !autoRoll;
+
+  const state = document.getElementById("autoRollState");
+
+  if(autoRoll){
+    state.textContent = "ON";
+    state.className = "autoOn";
+
+    if(!running){
+      roll();
+    }
+
+  }else{
+    state.textContent = "OFF";
+    state.className = "autoOff";
+
+    clearTimeout(autoRollTimer);
+  }
+}
 
 function roll(){
   if(running) return;
@@ -686,7 +743,7 @@ function roll(){
   function visualPick(){
     return viewers[Math.floor(Math.random() * viewers.length)];
   }
-
+  
   function weightedPick(){
     let total = 0;
 
@@ -772,8 +829,15 @@ function finish(v){
     bestText.classList.add("best-" + rarity(best.odds));
   }
 
-  save();
-  render();
+save();
+render();
+
+if(autoRoll){
+  autoRollTimer = setTimeout(() => {
+    if(!running){
+      roll();
+    }
+  }, 250);
 }
 
 /* INVENTORY */
