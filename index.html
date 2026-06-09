@@ -730,7 +730,40 @@ function toggleAutoRoll(){
   }
 }
 
+function weightedPick(){
+  let total = 0;
+
+  for (let v of viewers) {
+    total += 1 / v.odds;
+  }
+
+  let r = Math.random() * total;
+
+  let acc = 0;
+  for (let v of viewers) {
+    acc += 1 / v.odds;
+    if (r <= acc) return v;
+  }
+}
+
 function roll(){
+    if (document.hidden) {
+  
+    let final = weightedPick();
+  
+    rolls++;
+    document.getElementById("rolls").innerText = rolls;
+  
+    show(final);
+    finish(final);
+  
+    if(autoRoll){
+      setTimeout(roll, 3000);
+    }
+  
+    return;
+  }
+  
   if(running) return;
   running = true;
 
@@ -742,22 +775,6 @@ function roll(){
 
   function visualPick(){
     return viewers[Math.floor(Math.random() * viewers.length)];
-  }
-  
-  function weightedPick(){
-    let total = 0;
-
-    for (let v of viewers) {
-      total += 1 / v.odds;
-    }
-
-    let r = Math.random() * total;
-
-    let acc = 0;
-    for (let v of viewers) {
-      acc += 1 / v.odds;
-      if (r <= acc) return v;
-    }
   }
 
   function frame(t){
