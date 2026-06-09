@@ -542,6 +542,8 @@ function moveBlob(btn){
   blob.style.left = left + "px";
 }
 
+let autoRollStartTime = null;
+  
 function spawnCardSparklesOn(el, rarityType){
 
   el.querySelectorAll(".cardSparkle").forEach(e => e.remove());
@@ -715,18 +717,22 @@ function toggleAutoRoll(){
   const state = document.getElementById("autoRollState");
 
   if(autoRoll){
+
     state.textContent = "ON";
     state.className = "autoOn";
+
+    autoRollStartTime = Date.now();
 
     if(!running){
       roll();
     }
 
   }else{
+
     state.textContent = "OFF";
     state.className = "autoOff";
 
-    clearTimeout(autoRollTimer);
+    autoRollStartTime = null;
   }
 }
 
@@ -1055,6 +1061,43 @@ window.showCard = function(name){
     playCutscene(r);
   }
 };
+
+document.addEventListener("visibilitychange", () => {
+
+  if(!autoRoll) return;
+
+  if(document.hidden) return;
+
+  const now = Date.now();
+
+  const elapsed = now - autoRollStartTime;
+
+  const missedRolls = Math.floor(elapsed / 3000);
+
+  for(let i = 0; i < missedRolls; i++){
+
+    const final = weightedPick();
+
+    rolls++;
+    inventory[final.name] = (inventory[final.name] || 0) + 1;
+
+    if(!best || final.odds > best.odds){
+      best = {
+        name: final.name,
+        odds: final.odds
+      };
+    }
+  }
+
+  autoRollStartTime = now;
+
+  save();
+  render();
+
+  if(!running){
+    roll();
+  }
+});  
 
 </script>
 <div id="cutsceneOverlay"></div>
