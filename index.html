@@ -513,14 +513,29 @@ html, body {
   <div id="inventory" class="grid"></div>
 </div>
 <script>
+
+  const supabaseUrl = "https://YOUR_PROJECT.supabase.co";
+  const supabaseKey = "YOUR_ANON_KEY";
+
+  const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+  let user = null;
+  
   function showPage(page, btn){
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
 
-  if(page === "roll"){
-    document.getElementById("rollPage").classList.add("active");
-  } else {
-    document.getElementById("inventoryPage").classList.add("active");
+  if(page === "roll") document.getElementById("rollPage").classList.add("active");
+  if(page === "inventory") document.getElementById("inventoryPage").classList.add("active");
+  if(page === "leaderboard") {
+    document.getElementById("leaderboardPage").classList.add("active");
+    loadLeaderboard();
   }
+
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  btn.classList.add("active");
+
+  moveBlob(btn);
+}
 
   // update active button
   document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
@@ -886,10 +901,19 @@ function render(){
   }
 }
 
-function save(){
+async function save() {
   localStorage.setItem("inv", JSON.stringify(inventory));
   localStorage.setItem("rolls", rolls);
   localStorage.setItem("best", JSON.stringify(best));
+
+  if (!user) return;
+
+  await supabase.from("player_data").upsert({
+    user_id: user.id,
+    rolls: rolls,
+    inventory: inventory,
+    best: best
+  });
 }
 
 /* START */
@@ -912,6 +936,17 @@ window.cutscene = function(type){
     console.log("No cards found for rarity:", type);
     return;
   }
+
+window.addEventListener("load", async () => {
+  const { data } = await supabase.auth.getUser();
+
+  if (data?.user) {
+    user = data.user;
+    document.getElementById("auth").style.display = "none";
+    await loadPlayerData();
+    await loadLeaderboard();
+  }
+});
 
   // pick random card
   const v = pool[Math.floor(Math.random() * pool.length)];
@@ -1098,6 +1133,87 @@ document.addEventListener("visibilitychange", () => {
     roll();
   }
 });  
+
+async function register() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  const { error } = await supabase.auth.signUp({
+    email,
+    password
+  });
+
+  if (error) return alert(error.message);
+
+  alert("Check your email to confirm account!");
+}
+
+async function login() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password
+  });
+
+await supabase.from("player_data").upsert({
+  user_id: user.id,
+  rolls: 0,
+  inventory: {},
+  best: null
+});
+
+  if (error) return alert(error.message);
+
+  user = data.user;
+
+  document.getElementById("auth").style.display = "none";
+
+  await loadPlayerData();
+  await loadLeaderboard();
+}
+
+async function loadPlayerData() {
+  if (!user) return;
+
+  const { data, error } = await supabase
+    .from("player_data")
+    .select("*")
+    .eq("user_id", user.id)
+    .single();
+
+  if (error || !data) return;
+
+  rolls = data.rolls || 0;
+  inventory = data.inventory || {};
+  best = data.best || null;
+
+  document.getElementById("rolls").innerText = rolls;
+  render();
+}
+
+async function loadLeaderboard() {
+  const { data, error } = await supabase
+    .from("player_data")
+    .select("*")
+    .order("rolls", { ascending: false })
+    .limit(10);
+
+  if (error) return console.error(error);
+
+  const el = document.getElementById("leaderboard");
+  el.innerHTML = "";
+
+  data.forEach((p, i) => {
+    el.innerHTML += `
+      <div style="padding:6px;">
+        #${i + 1} — ${p.rolls} rolls — best:
+        ${p.best ? p.best.name : "None"}
+      </div>
+    `;
+  });
+}
 
 </script>
 <div id="cutsceneOverlay"></div>
