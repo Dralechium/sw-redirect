@@ -475,6 +475,15 @@ html, body {
 
 </div>
 
+<div id="auth">
+  <input id="email" placeholder="email">
+  <input id="password" type="password" placeholder="password">
+  <button onclick="login()">Login</button>
+  <button onclick="register()">Register</button>
+</div>
+
+<div id="leaderboard"></div>
+
 <!-- NAV (tabs) -->
 <div class="nav">
 
@@ -508,27 +517,30 @@ html, body {
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <!-- INVENTORY -->
 <div id="inventoryPage" class="page">
   <div id="inventory" class="grid"></div>
 </div>
 <script>
 
-  const supabaseUrl = "https://YOUR_PROJECT.supabase.co";
-  const supabaseKey = "YOUR_ANON_KEY";
-
-  const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-
-  let user = null;
+  const supabaseUrl = "https://rzedwbovmsldoufirmeg.supabase.co";
+  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6ZWR3Ym92bXNsZG91ZmlybWVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwODY3MTgsImV4cCI6MjA5NjY2MjcxOH0.T6-fFH68ThCrzB6E9soJKtwI-t3-6dpa_0EnlJa6fJ8";
+  
+  const supabase = window.supabase
+    ? window.supabase.createClient(supabaseUrl, supabaseKey)
+    : null;
   
   function showPage(page, btn){
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
 
-  if(page === "roll") document.getElementById("rollPage").classList.add("active");
-  if(page === "inventory") document.getElementById("inventoryPage").classList.add("active");
-  if(page === "leaderboard") {
-    document.getElementById("leaderboardPage").classList.add("active");
-    loadLeaderboard();
+  if(page === "roll") {
+    document.getElementById("rollPage").classList.add("active");
+  }
+
+  if(page === "inventory") {
+    document.getElementById("inventoryPage").classList.add("active");
   }
 
   document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
@@ -937,17 +949,6 @@ window.cutscene = function(type){
     return;
   }
 
-window.addEventListener("load", async () => {
-  const { data } = await supabase.auth.getUser();
-
-  if (data?.user) {
-    user = data.user;
-    document.getElementById("auth").style.display = "none";
-    await loadPlayerData();
-    await loadLeaderboard();
-  }
-});
-
   // pick random card
   const v = pool[Math.floor(Math.random() * pool.length)];
 
@@ -957,6 +958,11 @@ window.addEventListener("load", async () => {
   // trigger cutscene
   playCutscene(type);
 };
+
+window.addEventListener("load", async () => {
+  const { data } = await supabase.auth.getUser();
+...
+});
 
 function easeInExpo(t){
   return t === 0 ? 0 : Math.pow(2, 10 * (t - 1));
