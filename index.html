@@ -475,15 +475,6 @@ html, body {
 
 </div>
 
-<div id="auth">
-  <input id="email" placeholder="email">
-  <input id="password" type="password" placeholder="password">
-  <button onclick="login()">Login</button>
-  <button onclick="register()">Register</button>
-</div>
-
-<div id="leaderboard"></div>
-
 <!-- NAV (tabs) -->
 <div class="nav">
 
@@ -517,32 +508,21 @@ html, body {
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <!-- INVENTORY -->
 <div id="inventoryPage" class="page">
   <div id="inventory" class="grid"></div>
 </div>
 <script>
-
-  const supabaseUrl = "https://rzedwbovmsldoufirmeg.supabase.co";
-  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6ZWR3Ym92bXNsZG91ZmlybWVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwODY3MTgsImV4cCI6MjA5NjY2MjcxOH0.T6-fFH68ThCrzB6E9soJKtwI-t3-6dpa_0EnlJa6fJ8";
-  
-  const supabase = window.supabase
-    ? window.supabase.createClient(supabaseUrl, supabaseKey)
-    : null;
-  
   function showPage(page, btn){
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
 
-  if(page === "roll") {
+  if(page === "roll"){
     document.getElementById("rollPage").classList.add("active");
-  }
-
-  if(page === "inventory") {
+  } else {
     document.getElementById("inventoryPage").classList.add("active");
   }
 
+  // update active button
   document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
   btn.classList.add("active");
 
@@ -906,19 +886,10 @@ function render(){
   }
 }
 
-async function save() {
+function save(){
   localStorage.setItem("inv", JSON.stringify(inventory));
   localStorage.setItem("rolls", rolls);
   localStorage.setItem("best", JSON.stringify(best));
-
-  if (!user) return;
-
-  await supabase.from("player_data").upsert({
-    user_id: user.id,
-    rolls: rolls,
-    inventory: inventory,
-    best: best
-  });
 }
 
 /* START */
@@ -951,10 +922,6 @@ window.cutscene = function(type){
   // trigger cutscene
   playCutscene(type);
 };
-
-window.addEventListener("load", async () => {
-  const { data } = await supabase.auth.getUser();
-});
 
 function easeInExpo(t){
   return t === 0 ? 0 : Math.pow(2, 10 * (t - 1));
@@ -1131,91 +1098,6 @@ document.addEventListener("visibilitychange", () => {
     roll();
   }
 });  
-
-async function register() {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-
-  const { error } = await supabase.auth.signUp({
-    email,
-    password
-  });
-
-  if (error) return alert(error.message);
-
-  alert("Check your email to confirm account!");
-}
-
-async function login() {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-
-const { data, error } = await supabase.auth.signInWithPassword({
-  email,
-  password
-});
-
-if (error) return alert(error.message);
-
-user = data.user;
-
-await supabase.from("player_data").upsert({
-  user_id: user.id,
-  rolls: 0,
-  inventory: {},
-  best: null
-});
-
-  if (error) return alert(error.message);
-
-  user = data.user;
-
-  document.getElementById("auth").style.display = "none";
-
-  await loadPlayerData();
-  await loadLeaderboard();
-}
-
-async function loadPlayerData() {
-  if (!user) return;
-
-  const { data, error } = await supabase
-    .from("player_data")
-    .select("*")
-    .eq("user_id", user.id)
-    .single();
-
-  if (error || !data) return;
-
-  rolls = data.rolls || 0;
-  inventory = data.inventory || {};
-  best = data.best || null;
-
-  document.getElementById("rolls").innerText = rolls;
-  render();
-}
-
-async function loadLeaderboard() {
-  const { data, error } = await supabase
-    .from("player_data")
-    .select("*")
-    .order("rolls", { ascending: false })
-    .limit(10);
-
-  if (error) return console.error(error);
-
-  const el = document.getElementById("leaderboard");
-  el.innerHTML = "";
-
-  data.forEach((p, i) => {
-    el.innerHTML += `
-      <div style="padding:6px;">
-        #${i + 1} — ${p.rolls} rolls — best:
-        ${p.best ? p.best.name : "None"}
-      </div>
-    `;
-  });
-}
 
 </script>
 <div id="cutsceneOverlay"></div>
