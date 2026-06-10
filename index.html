@@ -1,25 +1,9 @@
 <!DOCTYPE html>
 <html>
-<button class="tab" onclick="loadLeaderboard()">Leaderboard</button>
 <head>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <meta charset="UTF-8">
 <title>theos RNG</title>
-
-<div id="leaderboardPage" class="page">
-  <div id="leaderboard"></div>
-</div>
-
-<div id="auth">
-  <input id="email" placeholder="email">
-  <input id="password" type="password" placeholder="password">
-
-  <button onclick="register()">Register</button>
-  <button onclick="login()">Login</button>
-
-  <div id="authStatus"></div>
-</div>
 
 <style>
 body{
@@ -538,72 +522,12 @@ html, body {
     document.getElementById("inventoryPage").classList.add("active");
   }
 
-  const supabaseUrl = "https://rzedwbovmsldoufirmeg.supabase.co/rest/v1/";
-  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6ZWR3Ym92bXNsZG91ZmlybWVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwODY3MTgsImV4cCI6MjA5NjY2MjcxOH0.T6-fFH68ThCrzB6E9soJKtwI-t3-6dpa_0EnlJa6fJ8";
-
-  const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-
-  let user = null;
-  
   // update active button
   document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
   btn.classList.add("active");
 
   moveBlob(btn);
 }
-
-async function register() {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password
-  });
-
-  if (error) return alert(error.message);
-
-  document.getElementById("authStatus").innerText = "Check email to confirm!";
-}
-
-async function login() {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password
-  });
-
-async function loadLeaderboard() {
-  const { data, error } = await supabase
-    .from("player_data")
-    .select("*")
-    .order("rolls", { ascending: false })
-    .limit(10);
-
-  const el = document.getElementById("leaderboard");
-  el.innerHTML = "";
-
-  data.forEach((p, i) => {
-    el.innerHTML += `
-      <div>
-        #${i + 1} — ${p.rolls} rolls — best: ${
-          p.best ? p.best.name : "None"
-        }
-      </div>
-    `;
-  });
-}
-
-  if (error) return alert(error.message);
-
-  user = data.user;
-
-  document.getElementById("auth").style.display = "none";
-
-  await loadPlayerData();
-} 
 
 function moveBlob(btn){
   const blob = document.getElementById("blob");
@@ -932,7 +856,7 @@ function finish(v){
     bestText.classList.add("best-" + rarity(best.odds));
   }
 
-saveToCloud();;
+save();
 render();
   
 }
@@ -962,33 +886,10 @@ function render(){
   }
 }
 
-async function saveToCloud() {
-  if (!user) return;
-
-  await supabase.from("player_data").upsert({
-    user_id: user.id,
-    rolls,
-    inventory,
-    best
-  });
-}
-
-async function loadPlayerData() {
-  const { data } = await supabase
-    .from("player_data")
-    .select("*")
-    .eq("user_id", user.id)
-    .single();
-
-  if (!data) return;
-
-  rolls = data.rolls || 0;
-  inventory = data.inventory || {};
-  best = data.best || null;
-
-  document.getElementById("rolls").innerText = rolls;
-
-  render();
+function save(){
+  localStorage.setItem("inv", JSON.stringify(inventory));
+  localStorage.setItem("rolls", rolls);
+  localStorage.setItem("best", JSON.stringify(best));
 }
 
 /* START */
@@ -1190,7 +1091,7 @@ document.addEventListener("visibilitychange", () => {
 
   autoRollStartTime = now;
 
-  saveToCloud();;
+  save();
   render();
 
   if(!running){
