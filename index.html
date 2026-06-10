@@ -4,7 +4,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8">
 <title>theos RNG</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 body{
   margin:0;
@@ -455,25 +455,6 @@ html, body {
 
 <body>
 
-<div id="loginBox" style="
-  position:fixed;
-  inset:0;
-  background:#0b0b0b;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  gap:10px;
-  z-index:99999;
-">
-  <input id="usernameInput" placeholder="Username">
-  <input id="emailInput" placeholder="Email">
-  <input id="passwordInput" type="password" placeholder="Password">
-
-  <button onclick="signup()">Sign Up</button>
-  <button onclick="login()">Login</button>
-</div>
-
 <!-- HEADER -->
 <div class="header">
 
@@ -503,7 +484,6 @@ html, body {
 
     <button class="tab active" onclick="showPage('roll', this)">Roll</button>
     <button class="tab" onclick="showPage('inventory', this)">Inventory</button>
-    <button class="tab" onclick="showPage('leaderboard', this)">Leaderboard</button>
 
   </div>
 
@@ -542,10 +522,6 @@ html, body {
     document.getElementById("inventoryPage").classList.add("active");
   }
 
-  if(page === "leaderboard"){
-  loadLeaderboard();
-  }
-  
   // update active button
   document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
   btn.classList.add("active");
@@ -565,66 +541,6 @@ function moveBlob(btn){
   blob.style.width = btn.offsetWidth + "px";
   blob.style.left = left + "px";
 }
-
-<div id="leaderboardPage" class="page">
-  <div id="leaderboard"></div>
-</div>
-
-// ===================== SUPABASE INIT =====================
-const SUPABASE_URL = "https://nglbkhglrjxjkizqslil.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5nbGJraGdscmp4amtpenFzbGlsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExMTAzNjYsImV4cCI6MjA5NjY4NjM2Nn0.wBaQAzE_2nvaBTCZHAJbfYh-EFZlngqqvAld3AtV9Xo";
-
-const supabase = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY
-);
-
-async function signup() {
-  const email = document.getElementById("emailInput").value;
-  const password = document.getElementById("passwordInput").value;
-  const username = document.getElementById("usernameInput").value;
-
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password
-  });
-
-  if (error) {
-    alert(error.message);
-    return;
-  }
-
-  const user = data.user;
-
-  await supabase.from("profiles").insert({
-    id: user.id,
-    username: username,
-    total_rolls: 0
-  });
-
-  currentUser = user;
-  document.getElementById("loginBox").style.display = "none";
-}
-
-async function login() {
-  const email = document.getElementById("emailInput").value;
-  const password = document.getElementById("passwordInput").value;
-
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password
-  });
-
-  if (error) {
-    alert(error.message);
-    return;
-  }
-
-  currentUser = data.user;
-  document.getElementById("loginBox").style.display = "none";
-}
-
-let currentUser = null;
 
 let autoRollStartTime = null;
   
@@ -723,27 +639,6 @@ function spawnCardSparklesOn(el, rarityType){
 }
 
 const sparkleGap = 20; // 👈 change this to increase/decrease spacing
-
-async function loadLeaderboard() {
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("*")
-    .order("total_rolls", { ascending: false })
-    .limit(50);
-
-  if (error) return;
-
-  const lb = document.getElementById("leaderboard");
-  lb.innerHTML = "";
-
-  data.forEach((p, i) => {
-    lb.innerHTML += `
-      <div style="padding:10px;border-bottom:1px solid #333;">
-        #${i + 1} ${p.username} — ${p.total_rolls} rolls
-      </div>
-    `;
-  });
-}
 
 /* VIEWERS */
 const viewers = [
@@ -864,15 +759,6 @@ function roll(){
   
     rolls++;
     document.getElementById("rolls").innerText = rolls;
-
-    if(currentUser){
-      supabase
-        .from("profiles")
-        .update({
-          total_rolls: rolls
-        })
-        .eq("id", currentUser.id);
-    }
   
     show(final);
     finish(final);
