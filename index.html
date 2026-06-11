@@ -559,23 +559,6 @@ const supabase = window.supabase.createClient(
   SUPABASE_ANON_KEY
 );
 
-const { data } = await supabase
-  .from("profiles")
-  .select("username")
-  .eq("id", user.id)
-  .single();
-  
-  const username = prompt(
-  "Choose a username:"
-);
-
-await supabase
-  .from("profiles")
-  .update({
-    username: username
-  })
-  .eq("id", user.id);
-
 async function signup() {
   const email = document.getElementById("emailInput").value;
   const password = document.getElementById("passwordInput").value;
