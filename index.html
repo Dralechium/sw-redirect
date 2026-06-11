@@ -676,9 +676,9 @@ const cardMigrations = {
 
 /* RARITY */
 function rarity(o){
-  if(o<=8) return "common";
-  if(o<=50) return "rare";
-  if(o<=256) return "epic";
+  if(o<=16) return "common";
+  if(o<=64) return "rare";
+  if(o<=500) return "epic";
   if(o<=1024) return "legendary";
   return "mythic";
 }
