@@ -516,7 +516,6 @@ html, body {
   <div id="leaderboard"></div>
 </div>
 <script>
-(() => {
   if (window.__THEOS_RNG_LOADED__) {
   console.warn("Script already loaded once — skipping duplicate execution.");
 } else {
@@ -1196,11 +1195,10 @@ document.addEventListener("visibilitychange", () => {
   save();
   render();
 
-    if(!running){
-      roll();
-    }
-  });  
-})();
+  if(!running){
+    roll();
+  }
+});  
 </script>
 <div id="cutsceneOverlay"></div>
 <div id="redLight"></div>
