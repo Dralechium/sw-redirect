@@ -523,7 +523,7 @@ html, body {
   window.__THEOS_RNG_LOADED__ = true;
 }  
   
-  function showPage(page, btn){
+  window.showPage = function(page, btn){
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
 
   if(page === "roll"){
@@ -803,7 +803,7 @@ let running=false;
 let autoRoll = false;
 let autoRollTimer = null;
 
-function toggleAutoRoll(){
+window.toggleAutoRoll = function(){
 
   autoRoll = !autoRoll;
 
@@ -845,7 +845,7 @@ function weightedPick(){
   }
 }
 
-function roll(){
+window.roll = function(){
     if (document.hidden) {
   
     let final = weightedPick();
