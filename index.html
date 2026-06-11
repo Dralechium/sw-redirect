@@ -658,20 +658,18 @@ const viewers = [
   {name:"IVDrale", odds:1000, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/6e71f426-65ca-4914-b6e8-0e5499f032cb-profile_image-70x70.png"},
   {name:"Gamingbyte444", odds:1024, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/a6d961bf-ece5-4464-9b1e-5a326cfebe94-profile_image-70x70.png"},
   {name:"Christ_Is_God", odds:5000, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/98b31c09-fa8b-4318-88bd-ef8a0443b772-profile_image-70x70.png"},
-  {name:"kazagd", odds:7500, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/7725062e-c231-406a-b000-34973ce973a2-profile_image-70x70.png"},
-  {name:"taiago7", odds:10000, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/133319eb-8b72-40c2-89f5-4bcf9c2dfa24-profile_image-70x70.png"}
-  {name:"spaceuk", odds:50000, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/66d53358-962a-4f18-8917-12a2d220e0ef-profile_image-70x70.png"}
-  {name:"theosGMD", odds:100000, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/0ffc8233-6b32-411e-bfbd-4167c09cc2a2-profile_image-70x70.png"}
+  {name:"spaceuk", odds:7500, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/66d53358-962a-4f18-8917-12a2d220e0ef-profile_image-70x70.png"},
+  {name:"theosGMD", odds:10000, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/0ffc8233-6b32-411e-bfbd-4167c09cc2a2-profile_image-70x70.png"}
 ];
 
 const defaultViewer = viewers[viewers.length - 1];
 
 /* RARITY */
 function rarity(o){
-  if(o<=25) return "common";
-  if(o<=100) return "rare";
-  if(o<=512) return "epic";
-  if(o<=5000) return "legendary";
+  if(o<=8) return "common";
+  if(o<=50) return "rare";
+  if(o<=256) return "epic";
+  if(o<=1000) return "legendary";
   return "mythic";
 }
 
