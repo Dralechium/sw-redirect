@@ -516,6 +516,11 @@ html, body {
   <div id="leaderboard"></div>
 </div>
 <script>
+  if (window.__THEOS_RNG_LOADED__) {
+  console.warn("Script already loaded once — skipping duplicate execution.");
+} else {
+  window.__THEOS_RNG_LOADED__ = true;
+  
   function showPage(page, btn){
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
 
