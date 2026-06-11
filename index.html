@@ -235,28 +235,23 @@ html, body {
 
 #authBox{
   position: fixed;
-  top: 12px;
-  right: 12px;
-
-  background: #111;
-  border: 2px solid #42ff29;
-  padding: 10px;
-  border-radius: 10px;
-
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-
-  width: 180px;
-  z-index: 9999;
+  top: 10px;
+  right: 10px;
+  background:#111;
+  padding:10px;
+  border:2px solid #42ff29;
+  border-radius:10px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  z-index:10000;
 }
 
 #authBox input{
   background:#000;
-  border:1px solid #333;
   color:white;
-  padding:6px;
-  font-family: 'Orbitron', Arial, sans-serif;
+  border:1px solid #333;
+  padding:5px;
 }
 
 #authBox button{
@@ -508,12 +503,14 @@ html, body {
   
     <div id="authStatus">Not logged in</div>
   </div>
+  
   <div class="hud">
 
     <div class="hudBox" id="rollBox">
-      <div>Rolls: <span id="rolls">0</span></div>
-      <div style="margin-top:6px;">
-        Best: <span id="best">None</span>
+      Rolls: <span id="rolls">0</span>
+    
+      <div id="bestInline" style="margin-top:6px;font-size:14px;color:#aaa;">
+        Best: None
       </div>
     </div>
 
@@ -521,6 +518,13 @@ html, body {
 
   </div>
 
+</div>
+
+<div id="authBox">
+  <input id="emailInput" placeholder="email">
+  <input id="passwordInput" type="password" placeholder="password">
+  <button onclick="signup()">Sign up</button>
+  <button onclick="login()">Login</button>
 </div>
 
 <!-- NAV (tabs) -->
@@ -818,14 +822,6 @@ let best = JSON.parse(localStorage.getItem("best")) || null;
 
 document.getElementById("rolls").innerText = rolls;
 
-if(best){
-  bestText.innerText = `${best.name} (1/${best.odds})`;
-  bestText.className = "";
-  bestText.classList.add("best-" + rarity(best.odds));
-} else {
-  bestText.innerText = "None";
-  bestText.className = "";
-}
 /* RNG */
 function pick(){
   // weighted selection so commons appear more often during flicker
@@ -833,6 +829,7 @@ function pick(){
 
   let total = weights.reduce((a,b)=>a+b,0);
   let r = Math.random() * total;
+  let bestInlineEl;
 
   for(let i = 0; i < viewers.length; i++){
     r -= weights[i];
@@ -976,6 +973,24 @@ function show(v){
   display.querySelectorAll(".cardSparkle").forEach(e => e.remove());
 }
 
+function updateBestUI(){
+  bestInlineEl = bestInlineEl || document.getElementById("bestInline");
+
+  if(!best){
+    bestInlineEl.innerText = "Best: None";
+    return;
+  }
+
+  bestInlineEl.innerText = `Best: ${best.name} (1/${best.odds})`;
+}
+
+if(best){
+  updateBestUI();
+} else {
+  best = null;
+  updateBestUI();
+}
+  
 /* FINISH */
 function finish(v){
 
@@ -994,10 +1009,10 @@ function finish(v){
 
   if(!best || v.odds > best.odds){
     best = { name:v.name, odds:v.odds };
-
+  
     const bestText = document.getElementById("best");
     bestText.innerText = `${best.name} (1/${best.odds})`;
-
+  
     bestText.className = "";
     bestText.classList.add("best-" + rarity(best.odds));
   }
