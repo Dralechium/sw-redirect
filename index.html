@@ -233,9 +233,52 @@ html, body {
   pointer-events:none;
 }
 
+#authBox{
+  position: fixed;
+  top: 12px;
+  right: 12px;
+
+  background: #111;
+  border: 2px solid #42ff29;
+  padding: 10px;
+  border-radius: 10px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  width: 180px;
+  z-index: 9999;
+}
+
+#authBox input{
+  background:#000;
+  border:1px solid #333;
+  color:white;
+  padding:6px;
+  font-family: 'Orbitron', Arial, sans-serif;
+}
+
+#authBox button{
+  background:#42ff29;
+  border:none;
+  padding:6px;
+  cursor:pointer;
+  font-family: 'Orbitron', Arial, sans-serif;
+}
+
+#authStatus{
+  font-size:12px;
+  color:#aaa;
+  text-align:center;
+}
+
 #rollBox{
   color:#42ff29;
   justify-self:start;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
 }
 
 #bestBox{
@@ -456,19 +499,25 @@ html, body {
 
 <!-- HEADER -->
 <div class="header">
-
+  <div id="authBox">
+    <input id="emailInput" placeholder="email" />
+    <input id="passwordInput" type="password" placeholder="password" />
+  
+    <button onclick="signup()">Sign up</button>
+    <button onclick="login()">Login</button>
+  
+    <div id="authStatus">Not logged in</div>
+  </div>
   <div class="hud">
 
     <div class="hudBox" id="rollBox">
-      Rolls: <span id="rolls">0</span>
+      <div>Rolls: <span id="rolls">0</span></div>
+      <div style="margin-top:6px;">
+        Best: <span id="best">None</span>
+      </div>
     </div>
 
     <h1>theos RNG</h1>
-
-    <div class="hudBox" id="bestBox">
-      <span>Best:</span>
-      <span id="best">None</span>
-    </div>
 
   </div>
 
@@ -583,10 +632,10 @@ async function signup() {
     return;
   }
 
-  const user = data.user;
+  currentUser = data.user;
 
-  currentUser = user;
-  document.getElementById("loginBox").style.display = "none";
+  document.getElementById("authStatus").innerText =
+    "Signed in: " + currentUser.email;
 }
 
 async function login() {
@@ -604,7 +653,9 @@ async function login() {
   }
 
   currentUser = data.user;
-  document.getElementById("loginBox").style.display = "none";
+
+  document.getElementById("authStatus").innerText =
+    "Logged in: " + currentUser.email;
 }
 
 let currentUser = null;
@@ -766,8 +817,6 @@ let rolls = Number(localStorage.getItem("rolls")||0);
 let best = JSON.parse(localStorage.getItem("best")) || null;
 
 document.getElementById("rolls").innerText = rolls;
-
-const bestText = document.getElementById("best");
 
 if(best){
   bestText.innerText = `${best.name} (1/${best.odds})`;
