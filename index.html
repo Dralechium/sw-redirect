@@ -1,9 +1,10 @@
+<!DOCTYPE html>
 <html>
 <head>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8">
 <title>theos RNG</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 body{
   margin:0;
@@ -233,47 +234,9 @@ html, body {
   pointer-events:none;
 }
 
-#authBox{
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  background:#111;
-  padding:10px;
-  border:2px solid #42ff29;
-  border-radius:10px;
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-  z-index:10000;
-}
-
-#authBox input{
-  background:#000;
-  color:white;
-  border:1px solid #333;
-  padding:5px;
-}
-
-#authBox button{
-  background:#42ff29;
-  border:none;
-  padding:6px;
-  cursor:pointer;
-  font-family: 'Orbitron', Arial, sans-serif;
-}
-
-#authStatus{
-  font-size:12px;
-  color:#aaa;
-  text-align:center;
-}
-
 #rollBox{
   color:#42ff29;
   justify-self:start;
-  display:flex;
-  flex-direction:column;
-  align-items:flex-start;
 }
 
 #bestBox{
@@ -494,37 +457,22 @@ html, body {
 
 <!-- HEADER -->
 <div class="header">
-  <div id="authBox">
-    <input id="emailInput" placeholder="email" />
-    <input id="passwordInput" type="password" placeholder="password" />
-  
-    <button onclick="signup()">Sign up</button>
-    <button onclick="login()">Login</button>
-  
-    <div id="authStatus">Not logged in</div>
-  </div>
-  
+
   <div class="hud">
 
     <div class="hudBox" id="rollBox">
       Rolls: <span id="rolls">0</span>
-    
-      <div id="bestInline" style="margin-top:6px;font-size:14px;color:#aaa;">
-        Best: None
-      </div>
     </div>
 
     <h1>theos RNG</h1>
 
+    <div class="hudBox" id="bestBox">
+      <span>Best:</span>
+      <span id="best">None</span>
+    </div>
+
   </div>
 
-</div>
-
-<div id="authBox">
-  <input id="emailInput" placeholder="email">
-  <input id="passwordInput" type="password" placeholder="password">
-  <button onclick="signup()">Sign up</button>
-  <button onclick="login()">Login</button>
 </div>
 
 <!-- NAV (tabs) -->
@@ -536,7 +484,6 @@ html, body {
 
     <button class="tab active" onclick="showPage('roll', this)">Roll</button>
     <button class="tab" onclick="showPage('inventory', this)">Inventory</button>
-    <button class="tab" onclick="showPage('leaderboard', this)">Leaderboard</button>
 
   </div>
 
@@ -565,31 +512,16 @@ html, body {
 <div id="inventoryPage" class="page">
   <div id="inventory" class="grid"></div>
 </div>
-<div id="leaderboardPage" class="page">
-  <div id="leaderboard"></div>
-</div>
 <script>
-  (() => {
-  if (window.__THEOS_RNG_LOADED__) {
-  console.warn("Script already loaded once — skipping duplicate execution.");
-} else {
-  window.__THEOS_RNG_LOADED__ = true;
-}  
-  
-  window.showPage = function(page, btn){
+  function showPage(page, btn){
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
 
   if(page === "roll"){
     document.getElementById("rollPage").classList.add("active");
-  }
-  else if(page === "inventory"){
+  } else {
     document.getElementById("inventoryPage").classList.add("active");
   }
-  else if(page === "leaderboard"){
-    document.getElementById("leaderboardPage").classList.add("active");
-    loadLeaderboard();
-  }
-  
+
   // update active button
   document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
   btn.classList.add("active");
@@ -609,60 +541,6 @@ function moveBlob(btn){
   blob.style.width = btn.offsetWidth + "px";
   blob.style.left = left + "px";
 }
-
-// ===================== SUPABASE INIT =====================
-const SUPABASE_URL = "https://nglbkhglrjxjkizqslil.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5nbGJraGdscmp4amtpenFzbGlsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExMTAzNjYsImV4cCI6MjA5NjY4NjM2Nn0.wBaQAzE_2nvaBTCZHAJbfYh-EFZlngqqvAld3AtV9Xo";
-
-// prevent double-init (fixes sw-redirect duplicate execution)
-window.supabaseClient = window.supabaseClient || window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY
-);
-
-const supabase = window.supabaseClient;
-
-async function signup() {
-  const email = document.getElementById("emailInput").value;
-  const password = document.getElementById("passwordInput").value;
-
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password
-  });
-
-  if (error) {
-    alert(error.message);
-    return;
-  }
-
-  currentUser = data.user;
-
-  document.getElementById("authStatus").innerText =
-    "Signed in: " + currentUser.email;
-}
-
-async function login() {
-  const email = document.getElementById("emailInput").value;
-  const password = document.getElementById("passwordInput").value;
-
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password
-  });
-
-  if (error) {
-    alert(error.message);
-    return;
-  }
-
-  currentUser = data.user;
-
-  document.getElementById("authStatus").innerText =
-    "Logged in: " + currentUser.email;
-}
-
-let currentUser = null;
 
 let autoRollStartTime = null;
   
@@ -762,27 +640,6 @@ function spawnCardSparklesOn(el, rarityType){
 
 const sparkleGap = 20; // 👈 change this to increase/decrease spacing
 
-async function loadLeaderboard() {
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("*")
-    .order("total_rolls", { ascending: false })
-    .limit(50);
-
-  if (error) return;
-
-  const lb = document.getElementById("leaderboard");
-  lb.innerHTML = "";
-
-  data.forEach((p, i) => {
-    lb.innerHTML += `
-      <div style="padding:10px;border-bottom:1px solid #333;">
-        #${i + 1} ${p.username} — ${p.total_rolls} rolls
-      </div>
-    `;
-  });
-}
-
 /* VIEWERS */
 const viewers = [
   {name:"duckwithsunnies", odds:2, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/6ef3b0ef-bc0b-463d-a3d9-1f2a646a534f-profile_image-70x70.png"},
@@ -799,6 +656,7 @@ const viewers = [
   {name:"midgatal", odds:500, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/bc185f86-30d2-4422-b547-5f4e3c504d54-profile_image-70x70.png"},
   {name:"ChefGmd", odds:512, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/f6dfdec2-1ad0-4757-aa3c-c061cc5cab69-profile_image-70x70.png"},
   {name:"IVDrale", odds:1000, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/6e71f426-65ca-4914-b6e8-0e5499f032cb-profile_image-70x70.png"},
+  {name:"Gamingbyte444", odds:1024, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/a6d961bf-ece5-4464-9b1e-5a326cfebe94-profile_image-70x70.png"},
   {name:"Christ_Is_God", odds:5000, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/98b31c09-fa8b-4318-88bd-ef8a0443b772-profile_image-70x70.png"},
   {name:"spaceuk", odds:7500, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/66d53358-962a-4f18-8917-12a2d220e0ef-profile_image-70x70.png"},
   {name:"theosGMD", odds:10000, image:"https://static-cdn.jtvnw.net/jtv_user_pictures/0ffc8233-6b32-411e-bfbd-4167c09cc2a2-profile_image-70x70.png"}
@@ -822,6 +680,16 @@ let best = JSON.parse(localStorage.getItem("best")) || null;
 
 document.getElementById("rolls").innerText = rolls;
 
+const bestText = document.getElementById("best");
+
+if(best){
+  bestText.innerText = `${best.name} (1/${best.odds})`;
+  bestText.className = "";
+  bestText.classList.add("best-" + rarity(best.odds));
+} else {
+  bestText.innerText = "None";
+  bestText.className = "";
+}
 /* RNG */
 function pick(){
   // weighted selection so commons appear more often during flicker
@@ -829,7 +697,6 @@ function pick(){
 
   let total = weights.reduce((a,b)=>a+b,0);
   let r = Math.random() * total;
-  let bestInlineEl;
 
   for(let i = 0; i < viewers.length; i++){
     r -= weights[i];
@@ -844,7 +711,7 @@ let running=false;
 let autoRoll = false;
 let autoRollTimer = null;
 
-window.toggleAutoRoll = function(){
+function toggleAutoRoll(){
 
   autoRoll = !autoRoll;
 
@@ -886,22 +753,13 @@ function weightedPick(){
   }
 }
 
-window.roll = function(){
+function roll(){
     if (document.hidden) {
   
     let final = weightedPick();
   
     rolls++;
     document.getElementById("rolls").innerText = rolls;
-
-    if(currentUser){
-      supabase
-        .from("profiles")
-        .update({
-          total_rolls: rolls
-        })
-        .eq("id", currentUser.id);
-    }
   
     show(final);
     finish(final);
@@ -973,24 +831,6 @@ function show(v){
   display.querySelectorAll(".cardSparkle").forEach(e => e.remove());
 }
 
-function updateBestUI(){
-  bestInlineEl = bestInlineEl || document.getElementById("bestInline");
-
-  if(!best){
-    bestInlineEl.innerText = "Best: None";
-    return;
-  }
-
-  bestInlineEl.innerText = `Best: ${best.name} (1/${best.odds})`;
-}
-
-if(best){
-  updateBestUI();
-} else {
-  best = null;
-  updateBestUI();
-}
-  
 /* FINISH */
 function finish(v){
 
@@ -1009,10 +849,10 @@ function finish(v){
 
   if(!best || v.odds > best.odds){
     best = { name:v.name, odds:v.odds };
-  
+
     const bestText = document.getElementById("best");
     bestText.innerText = `${best.name} (1/${best.odds})`;
-  
+
     bestText.className = "";
     bestText.classList.add("best-" + rarity(best.odds));
   }
@@ -1259,7 +1099,7 @@ document.addEventListener("visibilitychange", () => {
     roll();
   }
 });  
-})();
+
 </script>
 <div id="cutsceneOverlay"></div>
 <div id="redLight"></div>
