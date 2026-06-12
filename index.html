@@ -689,7 +689,7 @@ const MIGRATION_FLAG_KEY = "migration_v" + SAVE_VERSION + "_done";
 
 let inventory = JSON.parse(localStorage.getItem("inv")||"{}");
 let rolls = Number(localStorage.getItem("rolls")||0);
-let best = JSON.parse(localStorage.getItem("best")) || null;
+let best = null;
 
 const savedVersion = Number(localStorage.getItem("saveVersion") || 0);
 
@@ -701,16 +701,6 @@ if (savedVersion < SAVE_VERSION) {
 
 document.getElementById("rolls").innerText = rolls;
 
-const bestText = document.getElementById("best");
-
-if(best){
-  bestText.innerText = `${best.name} (1/${best.odds})`;
-  bestText.className = "";
-  bestText.classList.add("best-" + rarity(best.odds));
-} else {
-  bestText.innerText = "None";
-  bestText.className = "";
-}
 /* RNG */
 function pick(){
   // weighted selection so commons appear more often during flicker
@@ -926,9 +916,9 @@ function finish(v){
     playCutscene(r);
   }
 
-  if(!best || v.odds > best.odds){
-    best = { name:v.id, odds:v.odds };
-
+  if (!best || v.odds > best.odds) {
+    best = { name: v.id, odds: v.odds };
+  
     const bestText = document.getElementById("best");
     bestText.innerText = `${best.name} (1/${best.odds})`;
 
@@ -940,7 +930,40 @@ save();
 render();
   
 }
-  
+
+function updateBestUI() {
+  const bestText = document.getElementById("best");
+
+  if (!best) {
+    bestText.innerText = "None";
+    bestText.className = "";
+    return;
+  }
+
+  bestText.innerText = `${best.name} (1/${best.odds})`;
+  bestText.className = "";
+  bestText.classList.add("best-" + rarity(best.odds));
+}
+
+function recalcBest() {
+  let newBest = null;
+
+  for (const v of viewers) {
+    const count = inventory[v.id] || 0;
+    if (count > 0) {
+      if (!newBest || v.odds > newBest.odds) {
+        newBest = {
+          name: v.id,
+          odds: v.odds
+        };
+      }
+    }
+  }
+
+  best = newBest;
+  updateBestUI();
+}
+
 /* INVENTORY */
 function render(){
   let inv = document.getElementById("inventory");
@@ -1153,9 +1176,14 @@ if (!migrationDone) {
   migrateInventoryCards();
   migrateOldSave();
   migrateCardUpgrades();
+  recalcBest();
+  save();
 
   localStorage.setItem(MIGRATION_FLAG_KEY, "1");
 }
+
+recalcBest();
+updateBestUI();
 
 document.addEventListener("visibilitychange", () => {
 
