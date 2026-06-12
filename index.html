@@ -685,6 +685,8 @@ function rarity(o){
 
 /* DATA */
 const SAVE_VERSION = 1;
+const MIGRATION_FLAG_KEY = "migration_v" + SAVE_VERSION + "_done";
+
 let inventory = JSON.parse(localStorage.getItem("inv")||"{}");
 let rolls = Number(localStorage.getItem("rolls")||0);
 let best = JSON.parse(localStorage.getItem("best")) || null;
@@ -897,13 +899,12 @@ const cardUpgrades = {
 };
 
 function migrateCardUpgrades() {
+  // Only run ONCE during migration phase
   for (const v of viewers) {
     const upgrade = cardUpgrades[v.id];
     if (!upgrade) continue;
 
-    // no need to transfer inventory if id unchanged
-    // but we ensure odds update is consistent everywhere
-    if (v.odds !== upgrade.newOdds && v.odds === upgrade.oldOdds) {
+    if (v.odds === upgrade.oldOdds) {
       v.odds = upgrade.newOdds;
     }
   }
@@ -1143,9 +1144,18 @@ window.showCard = function(name){
   }
 };
 
-migrateInventoryCards();
-migrateOldSave();
-migrateCardUpgrades();
+const migrationDone = localStorage.getItem(MIGRATION_FLAG_KEY);
+
+if (!migrationDone) {
+
+  console.log("Running one-time migration...");
+
+  migrateInventoryCards();
+  migrateOldSave();
+  migrateCardUpgrades();
+
+  localStorage.setItem(MIGRATION_FLAG_KEY, "1");
+}
 
 document.addEventListener("visibilitychange", () => {
 
