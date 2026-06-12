@@ -1143,14 +1143,7 @@ window.showCard = function(name){
   }
 };
 
-const migrationVersion =
-  Number(localStorage.getItem("migrationVersion") || 0);
-
-if (migrationVersion < 1) {
-  migrateInventoryCards();
-  localStorage.setItem("migrationVersion", 1);
-}
-
+migrateInventoryCards();
 migrateOldSave();
 migrateCardUpgrades();
 
@@ -1171,7 +1164,7 @@ document.addEventListener("visibilitychange", () => {
     const final = weightedPick();
 
     rolls++;
-    inventory[final.id] = (inventory[final.id] || 0) + 1;
+    inventory[final.name] = (inventory[final.name] || 0) + 1;
 
     if(!best || final.odds > best.odds){
       best = {
