@@ -1143,7 +1143,14 @@ window.showCard = function(name){
   }
 };
 
-migrateInventoryCards();
+const migrationVersion =
+  Number(localStorage.getItem("migrationVersion") || 0);
+
+if (migrationVersion < 1) {
+  migrateInventoryCards();
+  localStorage.setItem("migrationVersion", 1);
+}
+
 migrateOldSave();
 migrateCardUpgrades();
 
