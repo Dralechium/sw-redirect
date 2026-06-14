@@ -114,6 +114,15 @@ html, body {
   padding:15px;
   background:#111;
   border-bottom:2px solid #222;
+  overflow:hidden;
+}
+
+.header h1 {
+  color: #42ff29;
+  text-shadow:
+    0 0 6px rgba(66,255,41,0.6),
+    0 0 14px rgba(66,255,41,0.4),
+    0 0 22px rgba(66,255,41,0.25);
 }
 
 .nav{
@@ -188,11 +197,13 @@ html, body {
   display:block;
 }
 
-.header h1{
-  color:#42ff29;
-  text-shadow:0 0 10px #42ff29;
-  margin:0;
-  justify-self:center;
+.hud{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position: relative;
+  padding:10px 20px;
+  gap:20px;
 }
 
 .best-common{
@@ -216,10 +227,15 @@ html, body {
 }  
 
 .hud{
-  display:grid;
-  grid-template-columns:1fr auto 1fr;
+  display:flex;
   align-items:center;
+  justify-content:space-between;
   padding:10px 20px;
+  gap:20px;
+}
+
+.hud h1{
+  text-align:center;
 }
 
 .hudBox{
@@ -240,8 +256,9 @@ html, body {
 }
 
 #bestBox{
-  justify-self:end;
+  margin-top:8px;
 }
+
 /* CENTER AREA */
 .roll-area{
   text-align:center;
@@ -275,6 +292,26 @@ html, body {
 }
 
 #odds{ color:#aaa; }
+
+#userBox{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:14px;
+  min-width:260px;
+}
+
+#usernameDisplay{
+  margin-right:6px;
+  font-size:18px; /* makes it bigger */
+  font-weight:700;
+
+  color:#42ff29;
+  text-shadow:
+    0 0 6px rgba(66,255,41,0.7),
+    0 0 14px rgba(66,255,41,0.5),
+    0 0 22px rgba(66,255,41,0.3);
+}
 
 .rollBtn{
   padding:18px 70px;
@@ -422,6 +459,21 @@ html, body {
   transform: scale(1.03);
 }
 
+.title {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  margin: 0;
+
+  color: #42ff29;
+  text-shadow:
+    0 0 6px rgba(66,255,41,0.6),
+    0 0 14px rgba(66,255,41,0.4),
+    0 0 22px rgba(66,255,41,0.25);
+}
+
 /* LOCKED STATE (NEW SYSTEM) */
 .card.locked{
   display:flex;
@@ -450,7 +502,207 @@ html, body {
   color:#aaa;
 }
 
+.authBtn{
+  padding:12px 18px;
+  border-radius:10px;
+  font-family:'Orbitron';
+  border:none;
+  cursor:pointer;
+
+  font-size:16px;
+  font-weight:600;
+}
+
+.btn-green{
+  background:#42ff29;
+  color:#0b0b0b;
+}
+
+.btn-grey{
+  background:#555;
+  color:white;
+}
+
+/* =========================
+   LEADERBOARD TABLE UI
+========================= */
+
+#leaderboard {
+  padding: 20px;
+}
+
+/* header row */
+.lbHeader {
+  display: grid;
+  grid-template-columns: 80px 1fr 1fr 1fr;
+  align-items: center;
+  
+  padding: 12px 16px;
+  margin-bottom: 10px;
+
+  color: #42ff29;
+  font-weight: bold;
+
+  border: 2px solid #42ff29;
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(66,255,41,0.35);
+  background: #0b0b0b;
+
+  text-align: center;
+}
+
+/* each leaderboard row */
+.lbRow {
+  display: grid;
+  grid-template-columns: 80px 1fr 1fr 1fr;
+  align-items: center;
+
+  padding: 14px 16px;
+  margin-bottom: 10px;
+
+  background: #000;
+  border: 2px solid #42ff29;
+  border-radius: 14px;
+
+  box-shadow: 0 0 10px rgba(66,255,41,0.25);
+
+  transition: 0.2s ease;
+}
+
+.lbRow:hover {
+  transform: scale(1.01);
+  box-shadow: 0 0 16px rgba(66,255,41,0.45);
+}
+
+/* cells */
+.lbCell {
+  text-align: center;
+  font-size: 15px;
+}
+
+.lbName {
+  text-align: center;
+  padding-left: 0;
+}
+
+/* best card rarity colors */
+.lb-common { color: gray; }
+.lb-rare { color: #4da6ff; }
+.lb-epic { color: #b84dff; }
+.lb-legendary { color: gold; }
+.lb-mythic { color: red; }
+
+/* =========================
+   AUTH MODAL STYLING (NEW)
+========================= */
+
+.authModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.authBox {
+  background: #0b0b0b;
+  padding: 25px;
+  border-radius: 14px;
+  width: 320px;
+  border: 2px solid #42ff29;
+  box-shadow: 0 0 18px rgba(66,255,41,0.25);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;   /* 👈 THIS centers everything */
+}
+
+.authBox h2 {
+  color: #42ff29;
+  text-align: center;
+  margin-bottom: 15px;
+  text-shadow: 0 0 10px rgba(66,255,41,0.4);
+}
+
+.authInput {
+  width: 100%;
+  box-sizing: border-box; /* IMPORTANT FIX */
+  margin: 8px 0;
+  padding: 10px;
+
+  background: #000;
+  border: 2px solid #42ff29;
+  border-radius: 8px;
+
+  color: #42ff29;
+  font-family: 'Orbitron', Arial, sans-serif;
+
+  outline: none;
+}
+
+.authInput::placeholder {
+  color: rgba(66,255,41,0.5);
+}
+
+.authSubmit {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+
+  background: #42ff29;
+  border: none;
+  border-radius: 8px;
+
+  color: #0b0b0b;
+  font-family: 'Orbitron', Arial, sans-serif;
+  font-weight: bold;
+
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(66,255,41,0.35);
+  transition: 0.2s ease;
+}
+
+.authSubmit:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 18px rgba(66,255,41,0.6);
+}
+
+.authClose {
+  width: 100%;
+  padding: 8px;
+  margin-top: 8px;
+
+  background: #111;
+  border: 2px solid #555;
+  border-radius: 8px;
+
+  color: white;
+  font-family: 'Orbitron', Arial, sans-serif;
+
+  cursor: pointer;
+}
+
+.authClose:hover {
+  border-color: #42ff29;
+  color: #42ff29;
+}
+
 </style>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+  const SUPABASE_URL = "https://qihjozufbsfgqnwsrjan.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpaGpvenVmYnNmZ3Fud3NyamFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzNTI0NDksImV4cCI6MjA5NjkyODQ0OX0.-KTNEJ9xz7X4DPp-wxe-AhoOxslGMmXi_EB_DSn9qdg";
+
+  window.supabase = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+</script>
+
 </head>
 
 <body>
@@ -459,20 +711,27 @@ html, body {
 <div class="header">
 
   <div class="hud">
-
-    <div class="hudBox" id="rollBox">
-      Rolls: <span id="rolls">0</span>
+  
+    <div>
+      <div class="hudBox" id="rollBox">
+        Rolls: <span id="rolls">0</span>
+      </div>
+  
+      <div class="hudBox" id="bestBox">
+        <span>Best:</span>
+        <span id="best">None</span>
+      </div>
     </div>
-
-    <h1>theos RNG</h1>
-
-    <div class="hudBox" id="bestBox">
-      <span>Best:</span>
-      <span id="best">None</span>
+  
+    <h1 class="title">theos RNG</h1>
+  
+    <div id="userBox">
+      <span id="usernameDisplay"></span>
+      <button id="logoutBtn" onclick="logout()" style="display:none;">Logout</button>
+      <div id="authButtons"></div>
     </div>
-
+  
   </div>
-
 </div>
 
 <!-- NAV (tabs) -->
@@ -484,6 +743,7 @@ html, body {
 
     <button class="tab active" onclick="showPage('roll', this)">Roll</button>
     <button class="tab" onclick="showPage('inventory', this)">Inventory</button>
+    <button class="tab" onclick="showPage('leaderboard', this)">Leaderboard</button>
 
   </div>
 
@@ -493,7 +753,6 @@ html, body {
 <div id="rollPage" class="page active">
 
   <div class="roll-area">
-
     <div id="display">
       <img id="img" src="https://i.pravatar.cc/150">
       <div id="name">Press Roll</div>
@@ -512,22 +771,32 @@ html, body {
 <div id="inventoryPage" class="page">
   <div id="inventory" class="grid"></div>
 </div>
+<div id="leaderboardPage" class="page">
+  <div id="leaderboard" style="padding:20px;"></div>
+</div>
 <script>
   function showPage(page, btn){
+
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
 
   if(page === "roll"){
     document.getElementById("rollPage").classList.add("active");
-  } else {
+  }
+
+  else if(page === "inventory"){
     document.getElementById("inventoryPage").classList.add("active");
+  }
+
+  else if(page === "leaderboard"){
+    document.getElementById("leaderboardPage").classList.add("active");
+    window.loadLeaderboard(); // refresh when opened
   }
 
   document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
   btn.classList.add("active");
 
   moveBlob(btn);
-
-  save(); // optional, but safe
+  save();
 }
 
 function moveBlob(btn){
@@ -543,6 +812,8 @@ function moveBlob(btn){
   blob.style.left = left + "px";
 }
 
+let cloudReady = false;
+window.cloudReady = false;
 let autoRollStartTime = null;
   
 function spawnCardSparklesOn(el, rarityType){
@@ -700,6 +971,59 @@ if (savedVersion < SAVE_VERSION) {
 }
 
 document.getElementById("rolls").innerText = rolls;
+render();
+let currentUser = null;
+
+window.loadLeaderboard = async function () {
+  const { data } = await supabase
+    .from("profiles")
+    .select("*")
+    .order("rolls", { ascending: false });
+
+  if (!data) return;
+
+  const container = document.getElementById("leaderboard");
+
+  let html = "";
+
+  // HEADER
+  html += `
+    <div class="lbHeader">
+      <div>Rank</div>
+      <div>Name</div>
+      <div>Rolls</div>
+      <div>Best Card</div>
+    </div>
+  `;
+
+  // ROWS
+  data.forEach((u, i) => {
+    const rolls = u.rolls ?? 0;
+    const bestName = u.best_name ?? "None";
+    const bestOdds = u.best_odds ?? Infinity;
+
+    const r =
+      bestOdds <= 16 ? "common" :
+      bestOdds <= 64 ? "rare" :
+      bestOdds <= 500 ? "epic" :
+      bestOdds <= 1024 ? "legendary" :
+      "mythic";
+
+    html += `
+      <div class="lbRow">
+        <div class="lbCell">#${i + 1}</div>
+        <div class="lbCell lbName">${u.username || "Unknown"}</div>
+        <div class="lbCell">${rolls}</div>
+        <div class="lbCell lb-${r}">
+          ${bestName}
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+};
+
 
 /* RNG */
 function pick(){
@@ -724,7 +1048,6 @@ function migrateInventoryCards() {
 
     let targetId = id;
 
-    // 1. handle explicit ID migration map
     if (cardMigrations[id]) {
       targetId = cardMigrations[id];
     }
@@ -888,6 +1211,13 @@ const cardUpgrades = {
   }
 };
 
+function getLocalDataSafe(){
+  return {
+    rolls: Number(localStorage.getItem("rolls") || 0),
+    inv: JSON.parse(localStorage.getItem("inv") || "{}")
+  };
+}
+
 function migrateCardUpgrades() {
   // Only run ONCE during migration phase
   for (const v of viewers) {
@@ -990,17 +1320,303 @@ function render(){
   }
 }
 
-function save(){
+function openLogin(){
+
+  document.getElementById("email").value = "";
+  document.getElementById("username").value = "";
+  document.getElementById("password").value = "";
+  document.getElementById("confirmPassword").value = "";
+  
+  document.getElementById("authModal").style.display = "flex";
+  document.getElementById("authTitle").innerText = "Login";
+
+  document.getElementById("username").style.display = "none";
+  document.getElementById("confirmPassword").style.display = "none";
+}
+
+function openSignup(){
+  
+  document.getElementById("email").value = "";
+  document.getElementById("username").value = "";
+  document.getElementById("password").value = "";
+  document.getElementById("confirmPassword").value = "";
+  
+  document.getElementById("authModal").style.display = "flex";
+  document.getElementById("authTitle").innerText = "Sign Up";
+
+  document.getElementById("username").style.display = "block";
+  document.getElementById("confirmPassword").style.display = "block";
+}
+
+function closeAuth(){
+  document.getElementById("authModal").style.display = "none";
+}
+
+function renderAuthUI(){
+  const authBox = document.getElementById("authButtons");
+  const userBox = document.getElementById("usernameDisplay");
+  const logoutBtn = document.getElementById("logoutBtn");
+
+  if(!authBox || !userBox || !logoutBtn) return;
+  
+  if(currentUser){
+
+    const username =
+      currentUser.user_metadata?.username ||
+      currentUser.username ||
+      "Unknown";
+
+    supabase.from("profiles")
+      .select("username")
+      .eq("id", currentUser.id)
+      .single()
+      .then(({ data }) => {
+        userBox.textContent = data?.username || "Unknown";
+      });
+    userBox.style.color = "#42ff29";
+
+    logoutBtn.style.display = "inline-block";
+    logoutBtn.className = "authBtn btn-grey";
+
+    authBox.innerHTML = ""; // remove login/signup
+
+  } else {
+
+    userBox.textContent = "";
+    logoutBtn.style.display = "none";
+
+    authBox.innerHTML = `
+      <button class="authBtn btn-green" onclick="openLogin()">Login</button>
+      <button class="authBtn btn-grey" onclick="openSignup()">Sign Up</button>
+    `;
+  }
+}
+
+async function logout(){
+
+  if(currentUser){
+    // push final state before logout
+    await supabase.from("profiles")
+      .update({
+        rolls: rolls,
+        best_name: best?.name || null,
+        best_odds: best?.odds || null,
+        inventory: inventory
+      })
+      .eq("id", currentUser.id);
+  }
+  localStorage.removeItem(LOCAL_SYNC_FLAG);
+  await supabase.auth.signOut();
+
+  currentUser = null;
+  cloudReady = false;
+
+  // 🔥 CLEAR LOCAL COMPLETELY (NO DUPES EVER)
+  inventory = {};
+  rolls = 0;
+  best = null;
+
+  localStorage.clear();
+
+  document.getElementById("rolls").innerText = "0";
+  updateBestUI();
+  render();
+
+  renderAuthUI();
+}
+
+const LOCAL_SYNC_FLAG = "local_synced_v1";
+
+async function mergeLocalToCloud() {
+  if (localStorage.getItem(LOCAL_SYNC_FLAG) === "1") return;
+  if (!currentUser) return;
+
+  const { data } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", currentUser.id)
+    .single();
+
+  if (!data) return;
+
+  const local = getLocalDataSafe();
+  const localRolls = local.rolls;
+  const localInv = local.inv;
+
+  const cloudInv = data.inventory || {};
+
+  // merge inventories (ADD counts)
+  const mergedInv = { ...cloudInv };
+
+  for (const [id, count] of Object.entries(localInv)) {
+    mergedInv[id] = (mergedInv[id] || 0) + count;
+  }
+
+  const mergedRolls = (data.rolls || 0) + localRolls;
+
+  await supabase
+    .from("profiles")
+    .update({
+      rolls: mergedRolls,
+      inventory: mergedInv
+    })
+    .eq("id", currentUser.id);
+
+  // clear local AFTER merge
+  localStorage.setItem("rolls", "0");
+  localStorage.setItem("inv", JSON.stringify({}));
+
+  localStorage.setItem(LOCAL_SYNC_FLAG, "1");
+}
+
+async function submitAuth(){
+
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
+  const usernameInput = document.getElementById("username");
+
+  const email = emailInput.value;
+  const password = passwordInput.value;
+  const username = usernameInput.value;
+  const confirmPassword =
+  document.getElementById("confirmPassword").value;
+
+  if(document.getElementById("authTitle").innerText === "Login"){
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if(error) return alert(error.message);
+
+    currentUser = data.user;
+    
+    // 1. load cloud first
+    await loadCloudData();
+    
+    // 2. merge local → cloud
+    await mergeLocalToCloud();
+    
+    // 3. reload FINAL cloud state
+    await loadCloudData();
+    
+    renderAuthUI();
+    closeAuth();
+
+  } else {
+  
+    if(password !== confirmPassword){
+      return alert("Passwords do not match.");
+    }
+  
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password
+    });
+
+    if(error) return alert(error.message);
+
+    currentUser = data.user;
+    
+    await supabase.from("profiles").upsert({
+      id: currentUser.id,
+      username: username,
+      email: email,
+      rolls: rolls || 0,
+      best_name: best?.name || null,
+      best_odds: best?.odds || null,
+      inventory: inventory ?? {}
+    });
+    
+    await loadCloudData();
+    renderAuthUI();   // 👈 ADD THIS
+    closeAuth();
+  }
+}
+
+async function loadCloudData(){
+  const { data } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", currentUser.id)
+    .single();
+
+  if(!data) return;
+
+  if (!currentUser) return;
+  
+  // only trust cloud if local is empty OR first login sync
+  const localRolls = Number(localStorage.getItem("rolls") || 0);
+  const localInv = JSON.parse(localStorage.getItem("inv") || "{}");
+  
+  rolls = Math.max(data.rolls ?? 0, localRolls);
+  inventory = data.inventory ?? {};
+  currentUser.user_metadata = {
+    username: data.username
+  };
+
+  if(data.best_name){
+    best = {
+      name: data.best_name,
+      odds: data.best_odds
+    };
+    updateBestUI();
+    cloudReady = true;
+    window.cloudReady = true;
+    
+    // force leaderboard refresh immediately
+    window.loadLeaderboard?.();
+  }
+
+  document.getElementById("rolls").innerText = rolls;
+  cloudReady = true;
+  window.cloudReady = true;
+}
+
+async function save(){
+
+  // ALWAYS save locally first
   localStorage.setItem("inv", JSON.stringify(inventory));
   localStorage.setItem("rolls", rolls);
   localStorage.setItem("best", JSON.stringify(best));
   localStorage.setItem("saveVersion", SAVE_VERSION);
+
+  if (currentUser && cloudReady === true && navigator.onLine) {
+    console.log("Saving to cloud...", { rolls, inventory });
+
+    await supabase.from("profiles")
+      .update({
+        rolls: rolls,
+        best_name: best?.name || null,
+        best_odds: best?.odds || null,
+        inventory: inventory
+      })
+      .eq("id", currentUser.id);
+    await window.loadLeaderboard?.();
+    if (currentUser && cloudReady) {
+    window.loadLeaderboard?.();
+    }
+  }
 }
 
 /* START */
-show(defaultViewer);
-render();
+async function init(){
+  const { data } = await supabase.auth.getSession();
 
+  if(data.session){
+    currentUser = data.session.user;
+    await loadCloudData();
+    renderAuthUI();
+  } else {
+    renderAuthUI();
+  }
+
+  show(defaultViewer);
+  render();
+}
+
+init();
 window.onload = () => {
   const firstTab = document.querySelector(".tab");
   moveBlob(firstTab);
@@ -1027,6 +1643,16 @@ window.cutscene = function(type){
   // trigger cutscene
   playCutscene(type);
 };
+
+supabase.auth.getSession().then(({ data }) => {
+  if (data.session) {
+    currentUser = data.session.user;
+    renderAuthUI();
+    loadCloudData();
+  } else {
+    renderAuthUI();
+  }
+});
 
 function easeInExpo(t){
   return t === 0 ? 0 : Math.pow(2, 10 * (t - 1));
@@ -1184,6 +1810,9 @@ if (!migrationDone) {
 
 recalcBest();
 updateBestUI();
+window.addEventListener("load", () => {
+  window.loadLeaderboard?.();
+});
 
 document.addEventListener("visibilitychange", () => {
 
@@ -1202,7 +1831,7 @@ document.addEventListener("visibilitychange", () => {
     const final = weightedPick();
 
     rolls++;
-    inventory[final.name] = (inventory[final.name] || 0) + 1;
+    inventory[final.id] = (inventory[final.id] || 0) + 1;
 
     if(!best || final.odds > best.odds){
       best = {
@@ -1226,5 +1855,25 @@ document.addEventListener("visibilitychange", () => {
 <div id="cutsceneOverlay"></div>
 <div id="redLight"></div>
 </div>
+
+<div id="authModal" class="authModal">
+
+  <div class="authBox">
+
+    <h2 id="authTitle">Login</h2>
+
+    <input id="email" class="authInput" placeholder="Enter Email...">
+    <input id="username" class="authInput" placeholder="Create Username..." style="display:none;">
+    <input id="password" class="authInput" type="password" placeholder="Enter Password...">
+    <input id="confirmPassword" class="authInput" type="password" placeholder="Confirm Password..." style="display:none;">
+    
+    <button onclick="submitAuth()" class="authSubmit">Submit</button>
+
+    <button onclick="closeAuth()" class="authClose">Close</button>
+
+  </div>
+
+</div>
+
 </body>
 </html>
